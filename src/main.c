@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
     printf("err_flag: %d\n", err_flag);
     printf("info.name        = %s\n", info.port_name);
     printf("info.description = %s\n", info.description); 
+    printf("info.product = %s\n", info.usb_product); 
     printf("\n");
 
     spu_get_num_ports(&num_ports, &err_flag);

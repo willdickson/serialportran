@@ -109,7 +109,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
             strncpy(info -> port_name, buf_ptr, SPU_BUF_LEN);
         }
         else {
-            strncpy(info -> bluetooth_address, "NA",SPU_BUF_LEN);
+            strncpy(info -> port_name, "NA",SPU_BUF_LEN);
         }
 
         buf_ptr = sp_get_port_description(port);
@@ -117,7 +117,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
             strncpy(info -> description, buf_ptr, SPU_BUF_LEN);
         }
         else {
-            strncpy(info -> bluetooth_address, "NA",SPU_BUF_LEN);
+            strncpy(info -> description, "NA",SPU_BUF_LEN);
         }
 
         buf_ptr = sp_get_port_usb_manufacturer(port);
@@ -125,7 +125,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
             strncpy(info -> usb_manufacturer, buf_ptr, SPU_BUF_LEN);
         }
         else {
-            strncpy(info -> bluetooth_address, "NA",SPU_BUF_LEN);
+            strncpy(info -> usb_manufacturer, "NA",SPU_BUF_LEN);
         }
 
         buf_ptr = sp_get_port_usb_product(port);
@@ -133,7 +133,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
             strncpy(info -> usb_product, buf_ptr, SPU_BUF_LEN);
         }
         else {
-            strncpy(info -> bluetooth_address, "NA",SPU_BUF_LEN);
+            strncpy(info -> usb_product, "NA",SPU_BUF_LEN);
         }
 
         buf_ptr = sp_get_port_usb_serial(port);
@@ -141,7 +141,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
             strncpy(info -> usb_serial, buf_ptr, SPU_BUF_LEN);
         }
         else {
-            strncpy(info -> bluetooth_address, "NA",SPU_BUF_LEN);
+            strncpy(info -> usb_serial, "NA",SPU_BUF_LEN);
         }
 
         buf_ptr = sp_get_port_bluetooth_address(port);
