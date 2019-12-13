@@ -15,6 +15,26 @@ void spu_msleep(int msecs) {
     usleep((useconds_t)(abs_usecs));
 }
 
+void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (port != NULL) {
+        if (sp_open(port,mode_flag) == SP_OK) {
+            *err_flag = SPU_OK;
+        }
+    }
+}
+
+
+void spu_close_port(struct sp_port *port, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (port != NULL) {
+        if (sp_close(port) == SP_OK) {
+            *err_flag = SPU_OK;
+        }
+    }
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;

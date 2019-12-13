@@ -10,7 +10,11 @@ program serial_test
     type(serialport_t)      :: port
     type(serialport_info_t) :: info
     logical                 :: ok
-    
+
+    character(len=100), allocatable      :: tmp
+
+    tmp  = 'wr'
+
 
     call port_list%update()
     call port_list%print_concise()
@@ -27,8 +31,9 @@ program serial_test
 
     info = port%get_info()
     call info%print_verbose()
-
     print '(/)'
+
+    call port%open_conn('rw')
 
 contains
 

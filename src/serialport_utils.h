@@ -26,6 +26,9 @@ struct spu_port_info {
 void spu_usleep(int usecs);
 void spu_msleep(int msecs);
 
+void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag);
+void spu_close_port(struct sp_port *port, int *err_flag);
+
 void spu_get_num_ports(int *num_ports, int *err_flag);
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);
 void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag);
