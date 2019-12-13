@@ -5,7 +5,6 @@ module serialport_types
     use, intrinsic :: iso_c_binding, only : c_char
     use, intrinsic :: iso_c_binding, only : c_int
 
-
     implicit none
     public
 
