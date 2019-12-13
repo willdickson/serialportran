@@ -15,6 +15,7 @@ module serialport_utils
     private
 
     public spu_open_port
+    public spu_close_port
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -41,6 +42,16 @@ module serialport_utils
             integer(c_int), intent(in), value :: mode_flag
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_open_port
+
+        !void spu_close_port(struct sp_port *port, int *err_flag)
+        subroutine spu_close_port(port, err_flag) &
+            bind(c,name="spu_close_port")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_close_port
 
         !void spu_get_num_ports(int *num_ports, int *err_flag)
         subroutine spu_get_num_ports(num_ports, err_flag) & 

@@ -15,6 +15,7 @@ void spu_msleep(int msecs) {
     usleep((useconds_t)(abs_usecs));
 }
 
+
 void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag) {
     *err_flag = SPU_ERR;
     if (port != NULL) {

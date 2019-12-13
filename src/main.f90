@@ -33,7 +33,9 @@ program serial_test
     call info%print_verbose()
     print '(/)'
 
-    call port%open_conn('rw')
+    call port%open_conn('rw',ok)
+
+    call port%close_conn(ok)
 
 contains
 

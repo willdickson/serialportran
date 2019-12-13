@@ -8,6 +8,7 @@ module serialport_dev
 
     use serialport_types 
     use serialport_utils, only            : spu_open_port
+    use serialport_utils, only            : spu_close_port
     use serialport_utils, only            : spu_free_port
     use serialport_utils, only            : spu_get_port_by_name
     use serialport_utils, only            : spu_get_port_by_number
@@ -24,7 +25,7 @@ module serialport_dev
     contains
         procedure :: get_info   => get_serialport_info
         procedure :: open_conn  => open_serialport   
-        !procedure :: close_conn => close_serialport 
+        procedure :: close_conn => close_serialport 
         final     :: del_serialport
     end type serialport_t
 
@@ -105,7 +106,6 @@ contains
         if (present(ok)) then
             ok = .false.
         end if
-
         if (.not. this%initialized) return 
 
         call get_mode_flag(mode, mode_flag, ok_mode)
@@ -116,10 +116,36 @@ contains
             if (present(ok)) then
                 ok = .true.
             end if
+            this%is_open_flag = .true.
         end if
 
     end subroutine open_serialport
 
+    subroutine close_serialport(this, ok)
+        implicit none
+
+        ! Arguments
+        class(serialport_t), intent(inout) ::this
+        logical, intent(out), optional     :: ok
+
+        ! Local variables
+        integer(c_int)                     :: err_flag
+
+        if (present(ok)) then
+            ok = .false.
+        end if
+        if (.not. this%initialized)  return
+        if (.not. this%is_open_flag) return
+
+        call spu_close_port(this%spu_port_ptr, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) then
+                ok = .true.
+            end if
+            this%is_open_flag = .false.
+        end if
+
+    end subroutine close_serialport
 
     function get_serialport_info(this) result(info)
         implicit none
