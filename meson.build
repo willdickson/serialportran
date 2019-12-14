@@ -22,7 +22,8 @@ fmain_sources = [
     'src/serialport_utils.f90', 
     'src/serialport_info.f90',
     'src/serialport_list.f90',
-    'src/serialport_dev.f90'
+    'src/serialport_dev.f90',
+    'src/serialport_config.f90',
     ]
 executable('fmain', fmain_sources, dependencies : [serialport], link_with : util_lib, link_language : 'fortran' )
 
