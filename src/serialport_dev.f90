@@ -162,7 +162,6 @@ contains
         implicit none
         type(serialport_t), intent(inout) :: this
         if (c_associated(this%spu_port_ptr)) then 
-            print *, 'freeing ptr'
             call spu_free_port(this%spu_port_ptr)
         end if
     end subroutine del_serialport
