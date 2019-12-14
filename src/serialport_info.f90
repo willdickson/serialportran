@@ -1,14 +1,15 @@
 module serialport_info
 
-    use, intrinsic :: iso_c_binding, only : c_char
-    use, intrinsic :: iso_c_binding, only : c_int
-    use, intrinsic :: iso_c_binding, only : c_ptr
-    use  serialport_types, only           : SPU_OK
-    use  serialport_types, only           : buf_len
-    use  serialport_types, only           : spu_port_info_t
-    use  serialport_utils, only           : get_transport_string
-    use  serialport_utils, only           : c_char_vector_to_string
-    use  serialport_utils, only           : spu_get_port_info
+    use, intrinsic :: iso_c_binding, only   : c_char
+    use, intrinsic :: iso_c_binding, only   : c_int
+    use, intrinsic :: iso_c_binding, only   : c_ptr
+    use, intrinsic :: iso_c_binding, only   : C_NULL_CHAR 
+    use  serialport_types, only             : SPU_OK
+    use  serialport_types, only             : buf_len
+    use  serialport_types, only             : spu_port_info_t
+    use  serialport_utils, only             : get_transport_string
+    use  serialport_utils, only             : c_char_vector_to_string
+    use  serialport_utils, only             : spu_get_port_info
 
     implicit none
     private
@@ -61,18 +62,23 @@ contains
         character(len=buf_len, kind=c_char) :: tmp  
 
         call c_char_vector_to_string(spu_info%port_name, tmp)
-        info%port_name = trim(tmp)
+        call replace_c_null_char(tmp)
+        info%port_name = trim(adjustl(tmp))
 
         call c_char_vector_to_string(spu_info%description, tmp)
+        call replace_c_null_char(tmp)
         info%description = trim(tmp)
 
         call c_char_vector_to_string(spu_info%usb_manufacturer, tmp)
+        call replace_c_null_char(tmp)
         info%usb_manufacturer = trim(tmp)
 
         call c_char_vector_to_string(spu_info%usb_product, tmp)
+        call replace_c_null_char(tmp)
         info%usb_product = trim(tmp)
 
         call c_char_vector_to_string(spu_info%usb_serial, tmp)
+        call replace_c_null_char(tmp)
         info%usb_serial = trim(tmp)
 
         call c_char_vector_to_string(spu_info%bluetooth_address, tmp)
@@ -129,13 +135,24 @@ contains
         implicit none
         class(serialport_info_t), intent(in) :: this
         integer, optional, intent(in)        :: ind
+
         if (present(ind)) then 
-            print '(I0,A,A,A,Z0.4,A,Z0.4,A,A)', ind, '   ', this%port_name, '   0x', & 
-                this%usb_vendor_id, '   0x', this%usb_product_id, '   ',  this%usb_serial
+            print '(I0,T5,A,T20,A,Z0.4,T30,A,Z0.4,T40,A)', ind, this%port_name, & 
+                '0x', this%usb_vendor_id, '0x', this%usb_product_id, this%usb_serial
         else
-            print '(A,A,Z0.4,A,Z0.4,A,A)', this%port_name, '   0x', this%usb_vendor_id, & 
-                '   0x', this%usb_product_id, '   ',  this%usb_serial
+            print '(A,T20,A,Z0.4,T30,A,Z0.4,T40,A)', this%port_name, '0x', &
+                this%usb_vendor_id, '0x', this%usb_product_id, this%usb_serial
         end if
     end subroutine print_info_concise
+
+
+    subroutine replace_c_null_char(c)
+        implicit none
+        character(len=*), intent(inout) :: c
+        integer :: i
+        do i=1,len(c)
+            if (c(i:i) == C_NULL_CHAR) c(i:i) = ' '
+        end do
+    end subroutine replace_c_null_char
 
 end module serialport_info

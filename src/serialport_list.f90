@@ -98,8 +98,7 @@ contains
         type(serialport_info_t)                :: info
         integer                                :: i
         print '(/)'
-        print '(A,A3,A,A11,A,A6,A,A5,A)', & 
-            '#', ' ', 'port', ' ', 'vid', ' ', 'pid ', ' ', 'serial'
+        print '(A,T5,A,T20,A,T30,A,T40,A)', '#', 'port', 'vid', 'pid ', 'serial'
         print '(A)', repeat('-',60)
         do i=1,this%length()
             info = this%get_info(i)
