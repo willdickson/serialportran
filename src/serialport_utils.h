@@ -29,10 +29,17 @@ void spu_msleep(int msecs);
 void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag);
 void spu_close_port(struct sp_port *port, int *err_flag);
 
+void spu_new_config(struct sp_port_config **config, int *err_flag);
+void spu_free_config(struct sp_port_config *config, int *err_flag);
+void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag);
+void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag);
+void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag);
+void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag);
+void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag);
+
 void spu_get_num_ports(int *num_ports, int *err_flag);
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);
 void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag);
-
 
 void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *err_flag);
 void spu_get_port_by_name(char name[], struct sp_port **port, int *err_flag);

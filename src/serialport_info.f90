@@ -26,7 +26,9 @@ module serialport_info
         integer                        :: usb_vendor_id
         integer                        :: usb_product_id
         integer                        :: transport
+        logical                        :: ok_flag = .false.
     contains
+        procedure :: ok            => get_info_ok_flag
         procedure :: print_verbose => print_info_verbose
         procedure :: print_concise => print_info_concise
     end type serialport_info_t
@@ -39,9 +41,13 @@ module serialport_info
 
 contains
 
-    function new_serialport_info_empty() result(info)
+    ! Constructors
+    ! -------------------------------------------------------------------------
+
+    function new_serialport_info_empty(ok_flag) result(info)
         implicit none
-        type(serialport_info_t) :: info
+        logical, optional, intent(in) :: ok_flag
+        type(serialport_info_t)       :: info
         info%port_name = ''
         info%description = ''
         info%usb_manufacturer = ''
@@ -53,6 +59,11 @@ contains
         info%usb_vendor_id = 0 
         info%usb_product_id =  0 
         info%transport = 0 
+        if (present(ok_flag)) then 
+            info%ok_flag = ok_flag
+        else
+            info%ok_flag = .true.
+        end if
     end function new_serialport_info_empty
 
     function new_serialport_info_from_spu(spu_info) result(info)
@@ -89,27 +100,32 @@ contains
         info%usb_vendor_id   = spu_info%usb_vendor_id
         info%usb_product_id  = spu_info%usb_product_id
         info%transport       = spu_info%transport
-
+        info%ok_flag = .true.
 
     end function new_serialport_info_from_spu
 
-    function new_serialport_info_from_ptr(spu_port_ptr,ok) result(info)
+    function new_serialport_info_from_ptr(spu_port_ptr) result(info)
         implicit none
         type(c_ptr), intent(in), value  :: spu_port_ptr
-        logical, optional, intent(out)  :: ok
         type(serialport_info_t)         :: info
         type(spu_port_info_t)           :: spu_info 
         integer(c_int)                  :: err_flag
-
-        info = serialport_info_t()
+        info = serialport_info_t(ok_flag=.false.)
         call spu_get_port_info(spu_port_ptr, spu_info, err_flag)
-        if (err_flag /= SPU_OK) then
-            if (present(ok)) ok = .false.
-        else
+        if (err_flag == SPU_OK) then
             info = serialport_info_t(spu_info)
-            if (present(ok)) ok = .true.
         end if
     end function  new_serialport_info_from_ptr
+
+    ! Methods
+    ! -------------------------------------------------------------------------
+
+    function get_info_ok_flag(this) result(val)
+        implicit none
+        class(serialport_info_t), intent(in) :: this
+        logical                              :: val
+        val = this%ok_flag
+    end function get_info_ok_flag
 
     subroutine print_info_verbose(this)
         implicit none

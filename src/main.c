@@ -11,11 +11,20 @@ int main(int argc, char* argv[])
     char port_desc[max_len];
     struct sp_port *port = NULL;
     struct spu_port_info info;
+    struct sp_port_config *config;
 
     spu_get_port_by_name("/dev/ttyACM0", &port, &err_flag);
-    printf("err_flag: %d\n", err_flag);
+    printf("err_flag (get port): %d\n", err_flag);
 
     spu_get_port_by_number(0, &port, &err_flag);
+    sp_open(port,SP_MODE_READ_WRITE);
+
+
+    err_flag = sp_new_config(&config);
+    printf("err_flag (new config) = %d\n", err_flag);
+    err_flag = sp_get_config(port,config);
+    printf("err_flag (get config)= %d\n", err_flag);
+    sp_free_config(config);
 
     spu_get_port_info(port, &info, &err_flag);
     printf("err_flag: %d\n", err_flag);
@@ -32,6 +41,7 @@ int main(int argc, char* argv[])
         spu_get_port_desc(i, port_desc, max_len, &err_flag);
         printf(" %d: %s, %s\n", i, port_name, port_desc);
     }
+
 
     printf("sizeof(int): %d\n", (int) sizeof(int));
 

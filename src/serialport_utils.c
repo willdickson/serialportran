@@ -10,6 +10,7 @@ void spu_usleep(int usecs) {
     usleep((useconds_t)(abs_usecs));
 }
 
+
 void spu_msleep(int msecs) {
     int abs_usecs = 1000*abs(msecs);
     usleep((useconds_t)(abs_usecs));
@@ -36,6 +37,64 @@ void spu_close_port(struct sp_port *port, int *err_flag) {
 }
 
 
+void spu_new_config(struct sp_port_config **config, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_new_config(config) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_free_config(struct sp_port_config *config, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (config != NULL) {
+        sp_free_config(config);
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag)
+{
+    *err_flag = SPU_ERR;
+    if (sp_get_config(port,config) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_baudrate(config,baudrate) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_baudrate(config,baudrate) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_bits(config,bits) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_bits(config,bits) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;
@@ -49,6 +108,7 @@ void spu_get_num_ports(int *num_ports, int *err_flag) {
     }
     return;
 }
+
 
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag) {
     struct sp_port **port_list;
@@ -70,6 +130,7 @@ void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_fla
     }
     return;
 }
+
 
 void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag) {
     struct sp_port **port_list;
@@ -183,6 +244,7 @@ void spu_get_port_by_name(char name[], struct sp_port **port, int *err_flag) {
     return;
 }
 
+
 void spu_get_port_by_number(int number, struct sp_port **port, int *err_flag) {
     struct sp_port **port_list;
     *err_flag = SPU_ERR;
@@ -196,6 +258,7 @@ void spu_get_port_by_number(int number, struct sp_port **port, int *err_flag) {
     }
     return;
 }
+
 
 void spu_free_port(struct sp_port *port) {
     sp_free_port(port);

@@ -1,41 +1,67 @@
 program serial_test
 
-    use serialport_list, only: serialport_list_t
-    use serialport_info, only: serialport_info_t
-    use serialport_dev,  only: serialport_t
+    use serialport_list,   only : serialport_list_t
+    use serialport_info,   only : serialport_info_t
+    use serialport_config, only : serialport_config_t
+    use serialport_dev,    only : serialport_t
 
     implicit none
 
-    type(serialport_list_t) :: port_list
-    type(serialport_t)      :: port
-    type(serialport_info_t) :: info
-    logical                 :: ok
-
-    character(len=100), allocatable      :: tmp
-
-    tmp  = 'wr'
-
+    type(serialport_list_t)     :: port_list
+    type(serialport_t)          :: port
+    type(serialport_info_t)     :: info
+    type(serialport_config_t)   :: config
+    logical                     :: ok
+    integer                     :: baudrate
+    integer                     :: bytesize
 
     call port_list%update()
     call port_list%print_concise()
 
-    port = serialport_t('/dev/ttyACM0',ok)
+    port = serialport_t('/dev/ttyACM0')
     print '(A,L)', 'ok = ', ok
-    if ( .not. ok )  then
+    if ( .not. port%ok() )  then
         print '(A)', 'port creation failed'
         stop
     else 
         print '(A)', 'port creation successful'
     end if
-    print '(/)'
+    print *, ''
 
     info = port%get_info()
+    print *, 'info.ok() = ', info%ok()
+    print *, ''
     call info%print_verbose()
-    print '(/)'
+    print *, ''
 
     call port%open_conn('rw',ok)
+    print *, 'ok = ', ok
+    print *, 'port%is_open() = ', port%is_open()
+
+    config = serialport_config_t(port%spu_port_ptr)
+    print *, 'config ok = ', config%ok() 
+
+    call config%get_baudrate(baudrate, ok)
+    print *, 'get_baudrate ok = ', ok
+    print *, 'baudrate = ', baudrate
+
+    call config%set_baudrate(115200,ok)
+    call config%get_baudrate(baudrate, ok)
+    print *, 'get_baudrate ok = ', ok
+    print *, 'baudrate = ', baudrate
+
+    call config%get_bytesize(bytesize, ok)
+    print *, 'get bytesize ok = ', ok
+    print *, 'bytesize = ',  bytesize
+
+    call config%set_bytesize(7, ok)
+    call config%get_bytesize(bytesize, ok)
+    print *, 'get bytesize ok = ', ok
+    print *, 'bytesize = ',  bytesize
 
     call port%close_conn(ok)
+    print *, 'ok = ', ok
+
 
 contains
 

@@ -16,6 +16,13 @@ module serialport_utils
 
     public spu_open_port
     public spu_close_port
+    public spu_new_config
+    public spu_free_config
+    public spu_get_config
+    public spu_get_config_baudrate
+    public spu_set_config_baudrate
+    public spu_get_config_bits
+    public spu_set_config_bits
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -43,6 +50,7 @@ module serialport_utils
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_open_port
 
+
         !void spu_close_port(struct sp_port *port, int *err_flag)
         subroutine spu_close_port(port, err_flag) &
             bind(c,name="spu_close_port")
@@ -53,6 +61,89 @@ module serialport_utils
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_close_port
 
+
+        !void spu_new_config(struct sp_port_config **config, int *err_flag)
+        subroutine spu_new_config(config, err_flag) &
+            bind(c,name="spu_new_config")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(out)          :: config 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_new_config
+
+
+        !void spu_free_config(struct sp_port_config *config, int *err_flag)
+        subroutine spu_free_config(config, err_flag) &
+            bind(c,name="spu_new_config")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value :: config 
+            integer(c_int), intent(out)    :: err_flag
+        end subroutine spu_free_config
+
+
+        !void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag);
+        subroutine spu_get_config(port, config, err_flag) &
+            bind(c,name="spu_get_config")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config
+
+
+        !void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag)
+        subroutine spu_get_config_baudrate(config, baudrate, err_flag) &
+            bind(c,name="spu_get_config_baudrate")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: baudrate
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_baudrate
+
+
+        !void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag)
+        subroutine spu_set_config_baudrate(config, baudrate, err_flag) &
+            bind(c,name="spu_set_config_baudrate")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: baudrate
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_baudrate
+
+
+        !void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag)
+        subroutine spu_get_config_bits(config, bits, err_flag) &
+            bind(c,name="spu_get_config_bits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: bits
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_bits
+
+
+        !void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag)
+        subroutine spu_set_config_bits(config, bits, err_flag) &
+            bind(c,name="spu_set_config_bits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: bits
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_bits
+        
+
         !void spu_get_num_ports(int *num_ports, int *err_flag)
         subroutine spu_get_num_ports(num_ports, err_flag) & 
             bind(c,name="spu_get_num_ports") 
@@ -61,6 +152,7 @@ module serialport_utils
             integer(c_int), intent(out)  :: num_ports
             integer(c_int), intent(out)  :: err_flag
         end subroutine spu_get_num_ports
+
 
         !void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag)
         subroutine spu_get_port_name(port_num, port_name, max_len, err_flag) & 
@@ -75,6 +167,7 @@ module serialport_utils
             integer(c_int), intent(out)            :: err_flag
         end subroutine spu_get_port_name
 
+
         !void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag)
         subroutine spu_get_port_desc(port_num, port_desc, max_len, err_flag) & 
             bind(c,name="spu_get_port_desc")
@@ -88,6 +181,7 @@ module serialport_utils
             integer(c_int), intent(out)            :: err_flag
         end subroutine spu_get_port_desc
 
+
         !void spu_get_port_by_name(char name[], struct sp_port **port, int *err_flag)
         subroutine spu_get_port_by_name(port_name, port, err_flag) & 
             bind(c,name="spu_get_port_by_name")
@@ -100,6 +194,7 @@ module serialport_utils
             integer(c_int), intent(out)         :: err_flag
         end subroutine
 
+
         !void spu_get_port_by_number(int number, struct sp_port **port, int *err_flag)
         subroutine spu_get_port_by_number(port_num, port, err_flag) &
             bind(c,name="spu_get_port_by_number")
@@ -110,6 +205,7 @@ module serialport_utils
             type(c_ptr), intent(out)            :: port
             integer(c_int), intent(out)         :: err_flag
         end subroutine spu_get_port_by_number
+
 
         !void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *err_flag)
         subroutine spu_get_port_info(port,info,err_flag) &
@@ -123,6 +219,7 @@ module serialport_utils
             integer(c_int), intent(out)         :: err_flag
         end subroutine spu_get_port_info
 
+
         !void spu_free_port(struct sp_port *port)
         subroutine spu_free_port(port) &
             bind(c,name="spu_free_port")
@@ -130,6 +227,7 @@ module serialport_utils
             implicit none
             type(c_ptr), intent(in), value :: port
         end subroutine spu_free_port
+
 
         !void spu_usleep(int usecs);
         subroutine spu_usleep(usec) &
@@ -139,6 +237,7 @@ module serialport_utils
             integer(c_int), intent(in), value  :: usec
         end subroutine spu_usleep 
 
+        
         !void spu_msleep(int msecs)
         subroutine spu_msleep(msec) &
             bind(c,name="spu_msleep")
@@ -173,6 +272,7 @@ contains
             string(i:i) = vector(i)
         end do 
     end subroutine  c_char_vector_to_string
+
 
     subroutine print_spu_port_info(info)
         implicit none
@@ -209,6 +309,7 @@ contains
         print '(1x,A,A)',       'transport:           ', trim(transport_string)
         print '(/)'
     end subroutine print_spu_port_info
+
 
     function get_transport_string(transport_int) result(transport_string)
         implicit none
