@@ -11,6 +11,8 @@ module serialport_config
     use serialport_utils, only : spu_set_config_baudrate
     use serialport_utils, only : spu_get_config_bits
     use serialport_utils, only : spu_set_config_bits
+    use serialport_utils, only : spu_get_config_parity
+    use serialport_utils, only : spu_set_config_parity
     use serialport_types 
 
     implicit none
@@ -24,6 +26,8 @@ module serialport_config
         procedure :: set_baudrate => set_config_baudrate
         procedure :: get_bytesize => get_config_bytesize
         procedure :: set_bytesize => set_config_bytesize
+        !procedure :: get_parity   => get_config_parity
+        !procedure :: set_parity   => set_config_parity
         procedure :: ok           => get_config_ok
         final     :: del_config
     end type serialport_config_t
@@ -151,6 +155,22 @@ contains
             if (present(ok)) ok = .true.
         end if
     end subroutine set_config_bytesize
+
+
+    subroutine get_config_parity(this, parity_mode, ok)
+        implicit none
+        class(serialport_config_t), intent(in)     :: this
+        character(len=:), allocatable, intent(out) :: parity_mode
+        logical, optional, intent(out)             :: ok
+    end subroutine get_config_parity
+
+
+    subroutine set_config_parity(this, parity_mode, ok)
+        implicit none
+        class(serialport_config_t), intent(in) :: this
+        character(len=*), intent(in)           :: parity_mode
+        logical, optional, intent(out)         :: ok
+    end subroutine set_config_parity
 
 
     ! Destructor

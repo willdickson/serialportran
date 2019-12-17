@@ -17,6 +17,8 @@ module serialport_utils
     public spu_set_config_baudrate
     public spu_get_config_bits
     public spu_set_config_bits
+    public spu_get_config_parity
+    public spu_set_config_parity
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -30,25 +32,25 @@ module serialport_utils
     public c_char_string_to_vector
     public print_spu_port_info
     public get_transport_string
-    public get_mode_flag
+    public get_mode_enum
 
     interface
 
-        !void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag)
-        subroutine spu_open_port(port, mode_flag, err_flag) &
-            bind(c,name="spu_open_port")
+        !void spu_open_port(struct sp_port *port, enum sp_mode mode_enum, int *err_flag)
+        subroutine spu_open_port(port, mode_enum, err_flag) &
+            bind(c, name="spu_open_port")
             import c_ptr
             import c_int
             implicit none
             type(c_ptr), intent(in), value    :: port
-            integer(c_int), intent(in), value :: mode_flag
+            integer(c_int), intent(in), value :: mode_enum
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_open_port
 
 
         !void spu_close_port(struct sp_port *port, int *err_flag)
         subroutine spu_close_port(port, err_flag) &
-            bind(c,name="spu_close_port")
+            bind(c, name="spu_close_port")
             import c_ptr
             import c_int
             implicit none
@@ -59,7 +61,7 @@ module serialport_utils
 
         !void spu_new_config(struct sp_port_config **config, int *err_flag)
         subroutine spu_new_config(config, err_flag) &
-            bind(c,name="spu_new_config")
+            bind(c, name="spu_new_config")
             import c_ptr
             import c_int
             implicit none
@@ -70,7 +72,7 @@ module serialport_utils
 
         !void spu_free_config(struct sp_port_config *config, int *err_flag)
         subroutine spu_free_config(config, err_flag) &
-            bind(c,name="spu_new_config")
+            bind(c, name="spu_new_config")
             import c_ptr
             import c_int
             implicit none
@@ -81,7 +83,7 @@ module serialport_utils
 
         !void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag);
         subroutine spu_get_config(port, config, err_flag) &
-            bind(c,name="spu_get_config")
+            bind(c, name="spu_get_config")
             import c_ptr
             import c_int
             implicit none
@@ -93,7 +95,7 @@ module serialport_utils
 
         !void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag)
         subroutine spu_get_config_baudrate(config, baudrate, err_flag) &
-            bind(c,name="spu_get_config_baudrate")
+            bind(c, name="spu_get_config_baudrate")
             import c_ptr
             import c_int
             implicit none
@@ -105,7 +107,7 @@ module serialport_utils
 
         !void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag)
         subroutine spu_set_config_baudrate(config, baudrate, err_flag) &
-            bind(c,name="spu_set_config_baudrate")
+            bind(c, name="spu_set_config_baudrate")
             import c_ptr
             import c_int
             implicit none
@@ -117,7 +119,7 @@ module serialport_utils
 
         !void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag)
         subroutine spu_get_config_bits(config, bits, err_flag) &
-            bind(c,name="spu_get_config_bits")
+            bind(c, name="spu_get_config_bits")
             import c_ptr
             import c_int
             implicit none
@@ -129,7 +131,7 @@ module serialport_utils
 
         !void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag)
         subroutine spu_set_config_bits(config, bits, err_flag) &
-            bind(c,name="spu_set_config_bits")
+            bind(c, name="spu_set_config_bits")
             import c_ptr
             import c_int
             implicit none
@@ -139,9 +141,33 @@ module serialport_utils
         end subroutine spu_set_config_bits
         
 
+        !void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *parity, int *err_flag)
+        subroutine spu_get_config_parity(config, parity_enum, err_flag) &
+            bind(c, name="spu_get_config_parity")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: parity_enum
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_parity
+
+
+        !void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag)
+        subroutine spu_set_config_parity(config, parity_enum, err_flag) &
+            bind(c, name="spu_set_config_parity")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: parity_enum
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_parity
+
+        
         !void spu_get_num_ports(int *num_ports, int *err_flag)
         subroutine spu_get_num_ports(num_ports, err_flag) & 
-            bind(c,name="spu_get_num_ports") 
+            bind(c, name="spu_get_num_ports") 
             import c_int
             implicit none
             integer(c_int), intent(out)  :: num_ports
@@ -151,7 +177,7 @@ module serialport_utils
 
         !void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag)
         subroutine spu_get_port_name(port_num, port_name, max_len, err_flag) & 
-            bind(c,name="spu_get_port_name")
+            bind(c, name="spu_get_port_name")
             import c_int
             import c_char
             import c_ptr
@@ -165,7 +191,7 @@ module serialport_utils
 
         !void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag)
         subroutine spu_get_port_desc(port_num, port_desc, max_len, err_flag) & 
-            bind(c,name="spu_get_port_desc")
+            bind(c, name="spu_get_port_desc")
             import c_int
             import c_char
             import c_ptr
@@ -179,7 +205,7 @@ module serialport_utils
 
         !void spu_get_port_by_name(char name[], struct sp_port **port, int *err_flag)
         subroutine spu_get_port_by_name(port_name, port, err_flag) & 
-            bind(c,name="spu_get_port_by_name")
+            bind(c, name="spu_get_port_by_name")
             import c_int
             import c_char
             import c_ptr
@@ -192,7 +218,7 @@ module serialport_utils
 
         !void spu_get_port_by_number(int number, struct sp_port **port, int *err_flag)
         subroutine spu_get_port_by_number(port_num, port, err_flag) &
-            bind(c,name="spu_get_port_by_number")
+            bind(c, name="spu_get_port_by_number")
             import c_int
             import c_ptr
             implicit none
@@ -204,7 +230,7 @@ module serialport_utils
 
         !void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *err_flag)
         subroutine spu_get_port_info(port,info,err_flag) &
-            bind(c,name="spu_get_port_info")
+            bind(c, name="spu_get_port_info")
             import c_int
             import c_ptr
             import spu_port_info_t
@@ -217,7 +243,7 @@ module serialport_utils
 
         !void spu_free_port(struct sp_port *port)
         subroutine spu_free_port(port) &
-            bind(c,name="spu_free_port")
+            bind(c, name="spu_free_port")
             import c_ptr
             implicit none
             type(c_ptr), intent(in), value :: port
@@ -226,7 +252,7 @@ module serialport_utils
 
         !void spu_usleep(int usecs);
         subroutine spu_usleep(usec) &
-            bind(c,name="spu_usleep")
+            bind(c, name="spu_usleep")
             import c_int
             implicit none
             integer(c_int), intent(in), value  :: usec
@@ -235,7 +261,7 @@ module serialport_utils
         
         !void spu_msleep(int msecs)
         subroutine spu_msleep(msec) &
-            bind(c,name="spu_msleep")
+            bind(c, name="spu_msleep")
             import c_int
             implicit none
             integer(c_int), intent(in), value  :: msec
@@ -323,25 +349,25 @@ contains
     end function get_transport_string
 
 
-    subroutine get_mode_flag(mode, mode_flag, ok)
+    subroutine get_mode_enum(mode, mode_enum, ok)
         implicit none
         character(len=*), intent(in) :: mode
-        integer(c_int), intent(out)  :: mode_flag
+        integer(c_int), intent(out)  :: mode_enum
         logical, intent(out)         :: ok
 
         ok = .true. 
         select case (trim(mode)) 
             case ('r')
-                mode_flag = SP_MODE_READ
+                mode_enum = SP_MODE_READ
             case ('w') 
-                mode_flag = SP_MODE_WRITE
+                mode_enum = SP_MODE_WRITE
             case ('rw', 'wr') 
-                mode_flag = SP_MODE_READ_WRITE 
+                mode_enum = SP_MODE_READ_WRITE 
             case default 
-                mode_flag = 0
+                mode_enum = 0
                 ok = .false.
         end select
-    end subroutine get_mode_flag
+    end subroutine get_mode_enum
 
 
 end module serialport_utils

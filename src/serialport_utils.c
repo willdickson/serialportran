@@ -106,6 +106,9 @@ void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *
 
 void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag) {
     *err_flag = SPU_ERR;
+    if (sp_set_config_parity(config, parity) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
 }
 
 

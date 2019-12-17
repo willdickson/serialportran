@@ -14,7 +14,7 @@ module serialport_dev
     use serialport_utils,  only           : spu_free_port
     use serialport_utils,  only           : spu_get_port_by_name
     use serialport_utils,  only           : spu_get_port_by_number
-    use serialport_utils,  only           : get_mode_flag 
+    use serialport_utils,  only           : get_mode_enum 
 
 
     implicit none
@@ -97,7 +97,7 @@ contains
         ! Local variables
         logical                            :: ok_mode 
         integer(c_int)                     :: err_flag
-        integer(c_int)                     :: mode_flag
+        integer(c_int)                     :: mode_enum
 
 
         if (present(ok)) then
@@ -105,10 +105,10 @@ contains
         end if
         if (.not.this%ok_flag) return
 
-        call get_mode_flag(mode, mode_flag, ok_mode)
+        call get_mode_enum(mode, mode_enum, ok_mode)
         if (.not. ok_mode) return 
 
-        call spu_open_port(this%spu_port_ptr, mode_flag, err_flag)
+        call spu_open_port(this%spu_port_ptr, mode_enum, err_flag)
         if (err_flag == SPU_OK) then
             if (present(ok)) then
                 ok = .true.
