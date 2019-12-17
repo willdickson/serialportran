@@ -36,6 +36,8 @@ void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate,
 void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag);
 void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag);
 void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag);
+void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *parity, int *err_flag);
+void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag);
 
 void spu_get_num_ports(int *num_ports, int *err_flag);
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);

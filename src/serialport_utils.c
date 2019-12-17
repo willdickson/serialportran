@@ -95,6 +95,20 @@ void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag)
 }
 
 
+
+void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *parity, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_parity(config, parity) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag) {
+    *err_flag = SPU_ERR;
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;

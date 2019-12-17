@@ -7,13 +7,15 @@ module serialport_dev
     use, intrinsic :: iso_c_binding, only : c_associated
 
     use serialport_types 
+    use serialport_info,   only           : serialport_info_t
+    use serialport_config, only           : serialport_config_t
     use serialport_utils,  only           : spu_open_port
     use serialport_utils,  only           : spu_close_port
     use serialport_utils,  only           : spu_free_port
     use serialport_utils,  only           : spu_get_port_by_name
     use serialport_utils,  only           : spu_get_port_by_number
-    use serialport_info,   only           : serialport_info_t
-    use serialport_config, only           : serialport_config_t
+    use serialport_utils,  only           : get_mode_flag 
+
 
     implicit none
 
@@ -186,28 +188,5 @@ contains
         end if
     end subroutine del_serialport
 
-
-    ! Utility procedures 
-    ! -----------------------------------------------------------------
-
-    subroutine get_mode_flag(mode, mode_flag, ok)
-        implicit none
-        character(len=*), intent(in) :: mode
-        integer(c_int), intent(out)  :: mode_flag
-        logical, intent(out)         :: ok
-
-        ok = .true. 
-        select case (trim(mode)) 
-            case ('r')
-                mode_flag = SP_MODE_READ
-            case ('w') 
-                mode_flag = SP_MODE_WRITE
-            case ('rw', 'wr') 
-                mode_flag = SP_MODE_READ_WRITE 
-            case default 
-                mode_flag = 0
-                ok = .false.
-        end select
-    end subroutine get_mode_flag
 
 end module serialport_dev

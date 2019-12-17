@@ -3,13 +3,7 @@ module serialport_utils
     use, intrinsic :: iso_c_binding, only : c_char
     use, intrinsic :: iso_c_binding, only : c_int
     use, intrinsic :: iso_c_binding, only : c_ptr
-    use serialport_types, only            : buf_len 
-    use serialport_types, only            : spu_port_info_t
-    use serialport_types, only            : SPU_OK
-    use serialport_types, only            : SPU_ERR
-    use serialport_types, only            : SP_TRANSPORT_NATIVE
-    use serialport_types, only            : SP_TRANSPORT_USB
-    use serialport_types, only            : SP_TRANSPORT_BLUETOOTH
+    use serialport_types 
 
     implicit none
     private
@@ -36,6 +30,7 @@ module serialport_utils
     public c_char_string_to_vector
     public print_spu_port_info
     public get_transport_string
+    public get_mode_flag
 
     interface
 
@@ -326,5 +321,27 @@ contains
                 transport_string = 'unknown'
         end select
     end function get_transport_string
+
+
+    subroutine get_mode_flag(mode, mode_flag, ok)
+        implicit none
+        character(len=*), intent(in) :: mode
+        integer(c_int), intent(out)  :: mode_flag
+        logical, intent(out)         :: ok
+
+        ok = .true. 
+        select case (trim(mode)) 
+            case ('r')
+                mode_flag = SP_MODE_READ
+            case ('w') 
+                mode_flag = SP_MODE_WRITE
+            case ('rw', 'wr') 
+                mode_flag = SP_MODE_READ_WRITE 
+            case default 
+                mode_flag = 0
+                ok = .false.
+        end select
+    end subroutine get_mode_flag
+
 
 end module serialport_utils
