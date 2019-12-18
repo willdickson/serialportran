@@ -14,6 +14,7 @@ program serial_test
     logical                       :: ok
     integer                       :: baudrate
     integer                       :: bytesize
+    integer                       :: stopbits
     character(len=:), allocatable :: parity_mode
 
 
@@ -39,18 +40,22 @@ program serial_test
     call port%open_conn('rw',ok)
     print *, 'ok = ', ok
     print *, 'port%is_open() = ', port%is_open()
+    print *, ''
 
     config = serialport_config_t(port%spu_port_ptr)
     print *, 'config ok = ', config%ok() 
+    print *, ''
 
     call config%get_baudrate(baudrate, ok)
     print *, 'get_baudrate ok = ', ok
     print *, 'baudrate = ', baudrate
+    print *, ''
 
     call config%set_baudrate(115200,ok)
     call config%get_baudrate(baudrate, ok)
     print *, 'get_baudrate ok = ', ok
     print *, 'baudrate = ', baudrate
+    print *, ''
 
     call config%get_bytesize(bytesize, ok)
     print *, 'get bytesize ok = ', ok
@@ -60,6 +65,7 @@ program serial_test
     call config%get_bytesize(bytesize, ok)
     print *, 'get bytesize ok = ', ok
     print *, 'bytesize = ',  bytesize
+    print *, ''
 
     call config%get_parity(parity_mode, ok)
     print *, 'get_parity ok = ', ok
@@ -69,6 +75,17 @@ program serial_test
     call config%get_parity(parity_mode, ok)
     print *, 'get_parity ok = ', ok
     print *, 'parity_mode = ', parity_mode
+    print *, ''
+
+    call config%get_stopbits(stopbits, ok)
+    print *, 'get_stopbits ok = ', ok
+    print *, 'stopbits = ', stopbits
+
+    call config%set_stopbits(2, ok)
+    call config%get_stopbits(stopbits, ok)
+    print *, 'get_stopbits ok = ', ok
+    print *, 'stopbits = ', stopbits
+    print *, ''
 
     call port%close_conn(ok)
     print *, 'ok = ', ok

@@ -112,6 +112,22 @@ void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity
 }
 
 
+void spu_get_config_stopbits(const struct sp_port_config *config, int *stopbits, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_stopbits(config, stopbits) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_stopbits(struct sp_port_config *config, int stopbits, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_stopbits(config, stopbits) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;

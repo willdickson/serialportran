@@ -19,6 +19,8 @@ module serialport_utils
     public spu_set_config_bits
     public spu_get_config_parity
     public spu_set_config_parity
+    public spu_get_config_stopbits
+    public spu_set_config_stopbits
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -167,6 +169,30 @@ module serialport_utils
         end subroutine spu_set_config_parity
 
         
+        !void spu_get_config_stopbits(const struct sp_port_config *config, int *stopbits, int *err_flag)
+        subroutine spu_get_config_stopbits(config, stopbits, err_flag) &
+            bind(c, name="spu_get_config_stopbits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: stopbits
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_stopbits
+
+
+        !void spu_set_config_stopbits(struct sp_port_config *config, int stopbits, int *err_flag)
+        subroutine spu_set_config_stopbits(config, stopbits, err_flag) &
+            bind(c, name="spu_set_config_stopbits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: stopbits
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_stopbits
+        
+
         !void spu_get_num_ports(int *num_ports, int *err_flag)
         subroutine spu_get_num_ports(num_ports, err_flag) & 
             bind(c, name="spu_get_num_ports") 

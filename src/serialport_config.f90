@@ -13,6 +13,8 @@ module serialport_config
     use serialport_utils, only : spu_set_config_bits
     use serialport_utils, only : spu_get_config_parity
     use serialport_utils, only : spu_set_config_parity
+    use serialport_utils, only : spu_get_config_stopbits
+    use serialport_utils, only : spu_set_config_stopbits
     use serialport_utils, only : get_parity_string
     use serialport_utils, only : get_parity_enum
     use serialport_types 
@@ -30,6 +32,8 @@ module serialport_config
         procedure :: set_bytesize => set_config_bytesize
         procedure :: get_parity   => get_config_parity
         procedure :: set_parity   => set_config_parity
+        procedure :: get_stopbits => get_config_stopbits
+        procedure :: set_stopbits => set_config_stopbits
         procedure :: ok           => get_config_ok
         final     :: del_config
     end type serialport_config_t
@@ -198,6 +202,45 @@ contains
             end if
         end if
     end subroutine set_config_parity
+
+
+    subroutine get_config_stopbits(this, stopbits, ok)
+        implicit none
+        class(serialport_config_t), intent(in) :: this
+        integer, intent(out)                   :: stopbits
+        logical, optional, intent(out)         :: ok
+        integer(c_int)                         :: stopbits_tmp
+        integer(c_int)                         :: err_flag
+
+        stopbits = 0
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_get_config_stopbits(this%spu_config_ptr, stopbits_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            stopbits = int(stopbits_tmp, kind(stopbits))
+        end if
+    end subroutine get_config_stopbits
+
+
+    subroutine set_config_stopbits(this, stopbits, ok)
+        implicit none
+        class(serialport_config_t), intent(in) :: this
+        integer, intent(in)                    :: stopbits
+        logical, optional, intent(out)         :: ok
+        integer(c_int)                         :: stopbits_tmp
+        integer(c_int)                         :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        stopbits_tmp = int(stopbits,kind(c_int))
+        call spu_set_config_stopbits(this%spu_config_ptr, stopbits_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+        end if
+    end subroutine set_config_stopbits
 
 
     ! Destructor
