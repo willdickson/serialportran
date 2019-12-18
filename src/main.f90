@@ -42,7 +42,7 @@ program serial_test
     print *, 'port%is_open() = ', port%is_open()
     print *, ''
 
-    config = serialport_config_t(port%spu_port_ptr)
+    config = port%get_config()
     print *, 'config ok = ', config%ok() 
     print *, ''
 
