@@ -33,6 +33,8 @@ module serialport_utils
     public print_spu_port_info
     public get_transport_string
     public get_mode_enum
+    public get_parity_string
+    public get_parity_enum
 
     interface
 
@@ -332,11 +334,11 @@ contains
     end subroutine print_spu_port_info
 
 
-    function get_transport_string(transport_int) result(transport_string)
+    function get_transport_string(transport_enum) result(transport_string)
         implicit none
-        integer(c_int), intent(in)     :: transport_int
+        integer(c_int), intent(in)     :: transport_enum
         character(len=:), allocatable  :: transport_string
-        select case (transport_int)
+        select case (transport_enum)
             case (SP_TRANSPORT_NATIVE)
                 transport_string = 'native'
             case (SP_TRANSPORT_USB)
@@ -368,6 +370,54 @@ contains
                 ok = .false.
         end select
     end subroutine get_mode_enum
+
+
+    function get_parity_string(parity_enum) result(parity_mode)
+        implicit none
+        integer(c_int), intent(in)    :: parity_enum
+        character(len=:), allocatable :: parity_mode
+        select case (parity_enum)
+            case (SP_PARITY_INVALID)
+                parity_mode = 'invalid'
+            case (SP_PARITY_NONE)
+                parity_mode = 'none'
+            case (SP_PARITY_ODD)     
+                parity_mode = 'odd'
+            case (SP_PARITY_EVEN) 
+                parity_mode = 'even'
+            case (SP_PARITY_MARK)
+                parity_mode = 'mark'
+            case (SP_PARITY_SPACE)
+                parity_mode = 'space'
+            case default
+                parity_mode = 'unknown'
+        end select
+    end function get_parity_string
+
+
+    subroutine get_parity_enum(parity_mode, parity_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: parity_mode
+        integer(c_int), intent(out)    :: parity_enum
+        logical                        :: ok
+        ok = .true.
+        select case (parity_mode)
+            case ('invalid')
+                parity_enum = SP_PARITY_INVALID 
+            case ('none') 
+                parity_enum = SP_PARITY_NONE    
+            case ('odd') 
+                parity_enum = SP_PARITY_ODD     
+            case ('even')
+                parity_enum = SP_PARITY_EVEN    
+            case ('mark')
+                parity_enum = SP_PARITY_MARK    
+            case ('space')
+                parity_enum = SP_PARITY_SPACE   
+            case default
+                ok = .false.
+        end select
+    end subroutine get_parity_enum
 
 
 end module serialport_utils

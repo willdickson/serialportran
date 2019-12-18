@@ -13,6 +13,8 @@ module serialport_config
     use serialport_utils, only : spu_set_config_bits
     use serialport_utils, only : spu_get_config_parity
     use serialport_utils, only : spu_set_config_parity
+    use serialport_utils, only : get_parity_string
+    use serialport_utils, only : get_parity_enum
     use serialport_types 
 
     implicit none
@@ -26,8 +28,8 @@ module serialport_config
         procedure :: set_baudrate => set_config_baudrate
         procedure :: get_bytesize => get_config_bytesize
         procedure :: set_bytesize => set_config_bytesize
-        !procedure :: get_parity   => get_config_parity
-        !procedure :: set_parity   => set_config_parity
+        procedure :: get_parity   => get_config_parity
+        procedure :: set_parity   => set_config_parity
         procedure :: ok           => get_config_ok
         final     :: del_config
     end type serialport_config_t
@@ -36,7 +38,6 @@ module serialport_config
         procedure :: new_serialport_config
         procedure :: new_serialport_config_from_ptr
     end interface serialport_config_t
-
 
 contains
 
@@ -162,6 +163,18 @@ contains
         class(serialport_config_t), intent(in)     :: this
         character(len=:), allocatable, intent(out) :: parity_mode
         logical, optional, intent(out)             :: ok
+        integer(c_int)                             :: parity_enum
+        integer(c_int)                             :: err_flag
+
+        parity_mode = ''
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_get_config_parity(this%spu_config_ptr, parity_enum, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            parity_mode = get_parity_string(parity_enum)
+        end if
     end subroutine get_config_parity
 
 
@@ -170,6 +183,20 @@ contains
         class(serialport_config_t), intent(in) :: this
         character(len=*), intent(in)           :: parity_mode
         logical, optional, intent(out)         :: ok
+        integer(c_int)                         :: parity_enum
+        integer(c_int)                         :: err_flag
+        logical                                :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_parity_enum(parity_mode, parity_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_config_parity(this%spu_config_ptr, parity_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
     end subroutine set_config_parity
 
 

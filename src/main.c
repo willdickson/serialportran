@@ -7,13 +7,14 @@ int main(int argc, char* argv[])
     int num_ports;
     int err_flag;
     int max_len = 100;
+    int parity;
     char port_name[max_len];
     char port_desc[max_len];
     struct sp_port *port = NULL;
     struct spu_port_info info;
     struct sp_port_config *config;
 
-    spu_get_port_by_name("/dev/ttyACM0", &port, &err_flag);
+    spu_get_port_by_name("/dev/ttyACM1", &port, &err_flag);
     printf("err_flag (get port): %d\n", err_flag);
 
     spu_get_port_by_number(0, &port, &err_flag);
@@ -24,6 +25,12 @@ int main(int argc, char* argv[])
     printf("err_flag (new config) = %d\n", err_flag);
     err_flag = sp_get_config(port,config);
     printf("err_flag (get config)= %d\n", err_flag);
+
+    err_flag = sp_get_config_parity(config,&parity);
+    printf("err_flag: %d\n", err_flag);
+    printf("parity:   %d\n", parity);
+
+
     sp_free_config(config);
 
     spu_get_port_info(port, &info, &err_flag);

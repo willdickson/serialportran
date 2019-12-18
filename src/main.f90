@@ -7,13 +7,15 @@ program serial_test
 
     implicit none
 
-    type(serialport_list_t)     :: port_list
-    type(serialport_t)          :: port
-    type(serialport_info_t)     :: info
-    type(serialport_config_t)   :: config
-    logical                     :: ok
-    integer                     :: baudrate
-    integer                     :: bytesize
+    type(serialport_list_t)       :: port_list
+    type(serialport_t)            :: port
+    type(serialport_info_t)       :: info
+    type(serialport_config_t)     :: config
+    logical                       :: ok
+    integer                       :: baudrate
+    integer                       :: bytesize
+    character(len=:), allocatable :: parity_mode
+
 
     call port_list%update()
     call port_list%print_concise()
@@ -58,6 +60,15 @@ program serial_test
     call config%get_bytesize(bytesize, ok)
     print *, 'get bytesize ok = ', ok
     print *, 'bytesize = ',  bytesize
+
+    call config%get_parity(parity_mode, ok)
+    print *, 'get_parity ok = ', ok
+    print *, 'parity_mode = ', parity_mode
+
+    call config%set_parity('none', ok)
+    call config%get_parity(parity_mode, ok)
+    print *, 'get_parity ok = ', ok
+    print *, 'parity_mode = ', parity_mode
 
     call port%close_conn(ok)
     print *, 'ok = ', ok
