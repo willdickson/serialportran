@@ -17,10 +17,14 @@ module serialport_config
     use serialport_utils, only : spu_set_config_stopbits
     use serialport_utils, only : spu_get_config_rts
     use serialport_utils, only : spu_set_config_rts
+    use serialport_utils, only : spu_get_config_cts
+    use serialport_utils, only : spu_set_config_cts
     use serialport_utils, only : get_parity_string
     use serialport_utils, only : get_parity_enum
     use serialport_utils, only : get_rts_string
     use serialport_utils, only : get_rts_enum
+    use serialport_utils, only : get_cts_string
+    use serialport_utils, only : get_cts_enum
     use serialport_types 
 
     implicit none
@@ -40,6 +44,8 @@ module serialport_config
         procedure :: set_stopbits => set_config_stopbits
         procedure :: get_rts      => get_config_rts
         procedure :: set_rts      => set_config_rts
+        procedure :: get_cts      => get_config_cts
+        procedure :: set_cts      => set_config_cts
         procedure :: ok           => get_config_ok
         final     :: del_config
     end type serialport_config_t
@@ -289,6 +295,49 @@ contains
             end if
         end if
     end subroutine set_config_rts
+
+
+    subroutine get_config_cts(this, cts, ok)
+        implicit none
+        class(serialport_config_t), intent(in)     :: this
+        character(len=:), allocatable, intent(out) :: cts
+        logical, optional, intent(out)             :: ok
+        integer(c_int)                             :: cts_enum
+        integer(c_int)                             :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_get_config_cts(this%spu_config_ptr, cts_enum, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            cts = get_cts_string(cts_enum)
+        end if
+    end subroutine get_config_cts
+
+
+    subroutine set_config_cts(this, cts, ok)
+        implicit none
+        class(serialport_config_t), intent(in) :: this
+        character(len=*), intent(in)           :: cts
+        logical, optional, intent(out)         :: ok
+        integer(c_int)                         :: cts_enum
+        integer(c_int)                         :: err_flag
+        logical                                :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_cts_enum(cts, cts_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_config_cts(this%spu_config_ptr, cts_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_config_cts
+
+
 
 
     ! Destructor

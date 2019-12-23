@@ -23,6 +23,8 @@ module serialport_utils
     public spu_set_config_stopbits
     public spu_get_config_rts
     public spu_set_config_rts
+    public spu_get_config_cts
+    public spu_set_config_cts
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -41,6 +43,8 @@ module serialport_utils
     public get_parity_enum
     public get_rts_string
     public get_rts_enum
+    public get_cts_string
+    public get_cts_enum
 
     interface
 
@@ -220,6 +224,30 @@ module serialport_utils
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_set_config_rts
         
+
+        !void spu_get_config_cts(const struct sp_port_config *config, enum sp_cts *cts, int *err_flag)
+        subroutine spu_get_config_cts(config, cts, err_flag) &
+            bind(c, name="spu_get_config_cts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: cts
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_cts
+
+
+        !void spu_set_config_cts(struct sp_port_config *config, enum sp_cts cts, int *err_flag)
+        subroutine spu_set_config_cts(config, cts, err_flag) &
+            bind(c, name="spu_set_config_cts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: cts
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_cts
+
 
         !void spu_get_num_ports(int *num_ports, int *err_flag)
         subroutine spu_get_num_ports(num_ports, err_flag) & 
@@ -407,11 +435,11 @@ contains
 
     subroutine get_mode_enum(mode_string, mode_enum, ok)
         implicit none
-        character(len=*), intent(in) :: mode_string
-        integer(c_int), intent(out)  :: mode_enum
-        logical, intent(out)         :: ok
+        character(len=*), intent(in)    :: mode_string
+        integer(c_int), intent(out)     :: mode_enum
+        logical, optional, intent(out)  :: ok
 
-        ok = .true. 
+        if (present(ok)) ok = .true. 
         select case (trim(mode_string)) 
             case ('r')
                 mode_enum = SP_MODE_READ
@@ -421,7 +449,7 @@ contains
                 mode_enum = SP_MODE_READ_WRITE 
             case default 
                 mode_enum = 0
-                ok = .false.
+                if (present(ok)) ok = .false.
         end select
     end subroutine get_mode_enum
 
@@ -453,8 +481,8 @@ contains
         implicit none
         character(len=*), intent(in)   :: parity_string
         integer(c_int), intent(out)    :: parity_enum
-        logical, intent(out)           :: ok
-        ok = .true.
+        logical, optional, intent(out) :: ok
+        if (present(ok)) ok = .true.
         select case (parity_string)
             case ('invalid')
                 parity_enum = SP_PARITY_INVALID 
@@ -469,7 +497,7 @@ contains
             case ('space')
                 parity_enum = SP_PARITY_SPACE   
             case default
-                ok = .false.
+                if (present(ok)) ok = .false.
                 parity_enum = SP_PARITY_INVALID 
         end select
     end subroutine get_parity_enum
@@ -496,10 +524,10 @@ contains
 
     subroutine get_rts_enum(rts_string, rts_enum, ok)
         implicit none
-        character(len=*), intent(in)  :: rts_string
-        integer(c_int), intent(out)   :: rts_enum
-        logical, intent(out)          :: ok
-        ok = .true.
+        character(len=*), intent(in)   :: rts_string
+        integer(c_int), intent(out)    :: rts_enum
+        logical, optional, intent(out) :: ok
+        if (present(ok)) ok = .true.
         select case (trim(rts_string))
             case ('invalid')
                 rts_enum = SP_RTS_INVALID
@@ -510,10 +538,47 @@ contains
             case ('flow_control')
                 rts_enum = SP_RTS_FLOW_CONTROL
             case default
-                ok = .false. 
+                if (present(ok)) ok = .false. 
                 rts_enum = SP_RTS_INVALID
         end select
     end subroutine get_rts_enum
+
+
+    function get_cts_string(cts_enum) result(cts_string)
+        implicit none
+        integer(c_int), intent(in)     :: cts_enum
+        character(len=:), allocatable  :: cts_string
+        select case (cts_enum)
+            case (SP_CTS_INVALID)
+                cts_string = 'invalid'
+            case (SP_CTS_IGNORE)
+                cts_string = 'ignore'
+            case (SP_CTS_FLOW_CONTROL)
+                cts_string = 'flow_control'
+            case default
+                cts_string = 'unknown'
+        end select
+    end function get_cts_string
+
+
+    subroutine get_cts_enum(cts_string, cts_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: cts_string
+        integer(c_int), intent(out)    :: cts_enum
+        logical, optional, intent(out) :: ok 
+        if (present(ok)) ok = .true.
+        select case (trim(cts_string))
+            case ('invalid')
+                cts_enum = SP_CTS_INVALID
+            case ('ignore')
+                cts_enum = SP_CTS_IGNORE
+            case ('flow_control')
+                cts_enum = SP_CTS_FLOW_CONTROL
+            case default
+                if (present(ok)) ok = .false. 
+                cts_enum = SP_CTS_INVALID
+        end select
+    end subroutine get_cts_enum
 
 
 end module serialport_utils

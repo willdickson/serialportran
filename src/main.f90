@@ -17,6 +17,7 @@ program serial_test
     integer                       :: stopbits
     character(len=:), allocatable :: parity_mode
     character(len=:), allocatable :: rts
+    character(len=:), allocatable :: cts
 
 
     call port_list%update()
@@ -99,6 +100,19 @@ program serial_test
     call config%get_rts(rts, ok)
     print *, 'get_rts ok = ', ok
     print *, 'rts = ', rts 
+    print *, ''
+
+    call config%get_cts(cts, ok)
+    print *, 'get_cts ok = ', ok
+    print *, 'cts = ', cts 
+    print *, ''
+
+    call config%set_cts('flow_control', ok)
+    print *, 'set_cts ok = ', ok
+    call config%get_cts(cts, ok)
+    print *, 'get_cts ok = ', ok
+    print *, 'cts = ', cts 
+    print *, ''
 
     call port%close_conn(ok)
     print *, 'ok = ', ok
