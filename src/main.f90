@@ -16,6 +16,7 @@ program serial_test
     integer                       :: bytesize
     integer                       :: stopbits
     character(len=:), allocatable :: parity_mode
+    character(len=:), allocatable :: rts
 
 
     call port_list%update()
@@ -82,10 +83,22 @@ program serial_test
     print *, 'stopbits = ', stopbits
 
     call config%set_stopbits(2, ok)
+    print *, 'set_stopbits ok = ', ok
     call config%get_stopbits(stopbits, ok)
     print *, 'get_stopbits ok = ', ok
     print *, 'stopbits = ', stopbits
     print *, ''
+
+    call config%get_rts(rts, ok)
+    print *, 'get_rts ok = ', ok
+    print *, 'rts = ', rts 
+    print *, ''
+
+    call config%set_rts('off', ok)
+    print *, 'set_rts ok = ', ok
+    call config%get_rts(rts, ok)
+    print *, 'get_rts ok = ', ok
+    print *, 'rts = ', rts 
 
     call port%close_conn(ok)
     print *, 'ok = ', ok

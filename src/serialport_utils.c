@@ -128,6 +128,22 @@ void spu_set_config_stopbits(struct sp_port_config *config, int stopbits, int *e
 }
 
 
+void spu_get_config_rts(const struct sp_port_config *config, enum sp_rts *rts, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_rts(config, rts) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_rts(struct sp_port_config *config, enum sp_rts rts, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_rts(config, rts) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;

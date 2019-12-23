@@ -15,8 +15,12 @@ module serialport_config
     use serialport_utils, only : spu_set_config_parity
     use serialport_utils, only : spu_get_config_stopbits
     use serialport_utils, only : spu_set_config_stopbits
+    use serialport_utils, only : spu_get_config_rts
+    use serialport_utils, only : spu_set_config_rts
     use serialport_utils, only : get_parity_string
     use serialport_utils, only : get_parity_enum
+    use serialport_utils, only : get_rts_string
+    use serialport_utils, only : get_rts_enum
     use serialport_types 
 
     implicit none
@@ -34,6 +38,8 @@ module serialport_config
         procedure :: set_parity   => set_config_parity
         procedure :: get_stopbits => get_config_stopbits
         procedure :: set_stopbits => set_config_stopbits
+        procedure :: get_rts      => get_config_rts
+        procedure :: set_rts      => set_config_rts
         procedure :: ok           => get_config_ok
         final     :: del_config
     end type serialport_config_t
@@ -243,6 +249,48 @@ contains
     end subroutine set_config_stopbits
 
 
+    subroutine get_config_rts(this, rts, ok)
+        implicit none
+        class(serialport_config_t), intent(in)     :: this
+        character(len=:), allocatable, intent(out) :: rts
+        logical, optional, intent(out)             :: ok
+        integer(c_int)                             :: rts_enum
+        integer(c_int)                             :: err_flag
+
+        rts = ''
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_get_config_rts(this%spu_config_ptr, rts_enum, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            rts = get_rts_string(rts_enum)
+        end if
+    end subroutine get_config_rts
+
+
+    subroutine set_config_rts(this, rts, ok)
+        implicit none
+        class(serialport_config_t), intent(in) :: this
+        character(len=*), intent(in)           :: rts
+        logical, optional, intent(out)         :: ok
+        integer(c_int)                         :: rts_enum
+        integer(c_int)                         :: err_flag
+        logical                                :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_rts_enum(rts, rts_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_config_rts(this%spu_config_ptr, rts_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_config_rts
+
+
     ! Destructor
     ! -------------------------------------------------------------------------
     subroutine del_config(this)
@@ -250,7 +298,7 @@ contains
         type(serialport_config_t), intent(inout) :: this
         integer(c_int)                           :: err_flag
         if (c_associated(this%spu_config_ptr)) then 
-            call spu_free_config(this%spu_config_ptr,err_flag)
+            call spu_free_config(this%spu_config_ptr, err_flag)
         end if
     end subroutine del_config
 

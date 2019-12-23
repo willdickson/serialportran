@@ -40,6 +40,8 @@ void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *
 void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag);
 void spu_get_config_stopbits(const struct sp_port_config *config, int *stopbits, int *err_flag);
 void spu_set_config_stopbits(struct sp_port_config *config, int stopbits, int *err_flag);
+void spu_get_config_rts(const struct sp_port_config *config, enum sp_rts *rts, int *err_flag);
+void spu_set_config_rts(struct sp_port_config *config, enum sp_rts rts, int *err_flag);
 
 void spu_get_num_ports(int *num_ports, int *err_flag);
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);

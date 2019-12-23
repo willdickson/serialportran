@@ -21,6 +21,8 @@ module serialport_utils
     public spu_set_config_parity
     public spu_get_config_stopbits
     public spu_set_config_stopbits
+    public spu_get_config_rts
+    public spu_set_config_rts
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -37,6 +39,8 @@ module serialport_utils
     public get_mode_enum
     public get_parity_string
     public get_parity_enum
+    public get_rts_string
+    public get_rts_enum
 
     interface
 
@@ -191,6 +195,30 @@ module serialport_utils
             integer(c_int), intent(in), value :: stopbits
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_set_config_stopbits
+
+
+        !void spu_get_config_rts(const struct sp_port_config *config, enum sp_rts *rts, int *err_flag)
+        subroutine spu_get_config_rts(config, rts, err_flag) &
+            bind(c, name="spu_get_config_rts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: rts
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_rts
+
+
+        !void spu_set_config_rts(struct sp_port_config *config, enum sp_rts rts, int *err_flag)
+        subroutine spu_set_config_rts(config, rts, err_flag) &
+            bind(c, name="spu_set_config_rts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: rts
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_rts
         
 
         !void spu_get_num_ports(int *num_ports, int *err_flag)
@@ -377,14 +405,14 @@ contains
     end function get_transport_string
 
 
-    subroutine get_mode_enum(mode, mode_enum, ok)
+    subroutine get_mode_enum(mode_string, mode_enum, ok)
         implicit none
-        character(len=*), intent(in) :: mode
+        character(len=*), intent(in) :: mode_string
         integer(c_int), intent(out)  :: mode_enum
         logical, intent(out)         :: ok
 
         ok = .true. 
-        select case (trim(mode)) 
+        select case (trim(mode_string)) 
             case ('r')
                 mode_enum = SP_MODE_READ
             case ('w') 
@@ -398,36 +426,36 @@ contains
     end subroutine get_mode_enum
 
 
-    function get_parity_string(parity_enum) result(parity_mode)
+    function get_parity_string(parity_enum) result(parity_string)
         implicit none
         integer(c_int), intent(in)    :: parity_enum
-        character(len=:), allocatable :: parity_mode
+        character(len=:), allocatable :: parity_string
         select case (parity_enum)
             case (SP_PARITY_INVALID)
-                parity_mode = 'invalid'
+                parity_string = 'invalid'
             case (SP_PARITY_NONE)
-                parity_mode = 'none'
+                parity_string = 'none'
             case (SP_PARITY_ODD)     
-                parity_mode = 'odd'
+                parity_string = 'odd'
             case (SP_PARITY_EVEN) 
-                parity_mode = 'even'
+                parity_string = 'even'
             case (SP_PARITY_MARK)
-                parity_mode = 'mark'
+                parity_string = 'mark'
             case (SP_PARITY_SPACE)
-                parity_mode = 'space'
+                parity_string = 'space'
             case default
-                parity_mode = 'unknown'
+                parity_string = 'unknown'
         end select
     end function get_parity_string
 
 
-    subroutine get_parity_enum(parity_mode, parity_enum, ok)
+    subroutine get_parity_enum(parity_string, parity_enum, ok)
         implicit none
-        character(len=*), intent(in)   :: parity_mode
+        character(len=*), intent(in)   :: parity_string
         integer(c_int), intent(out)    :: parity_enum
-        logical                        :: ok
+        logical, intent(out)           :: ok
         ok = .true.
-        select case (parity_mode)
+        select case (parity_string)
             case ('invalid')
                 parity_enum = SP_PARITY_INVALID 
             case ('none') 
@@ -442,8 +470,50 @@ contains
                 parity_enum = SP_PARITY_SPACE   
             case default
                 ok = .false.
+                parity_enum = SP_PARITY_INVALID 
         end select
     end subroutine get_parity_enum
+
+
+    function get_rts_string(rts_enum) result(rts_string)
+        implicit none
+        integer(c_int), intent(in)    :: rts_enum
+        character(len=:), allocatable :: rts_string
+        select case (rts_enum)
+            case (SP_RTS_INVALID)
+                rts_string = 'invalid'
+            case (SP_RTS_OFF)
+                rts_string = 'off'
+            case (SP_RTS_ON) 
+                rts_string = 'on'
+            case (SP_RTS_FLOW_CONTROL)
+                rts_string = 'flow_control'
+            case default
+                rts_string = 'unknown'
+        end select
+    end function get_rts_string
+
+
+    subroutine get_rts_enum(rts_string, rts_enum, ok)
+        implicit none
+        character(len=*), intent(in)  :: rts_string
+        integer(c_int), intent(out)   :: rts_enum
+        logical, intent(out)          :: ok
+        ok = .true.
+        select case (trim(rts_string))
+            case ('invalid')
+                rts_enum = SP_RTS_INVALID
+            case ('off')
+                rts_enum = SP_RTS_OFF
+            case ('on')
+                rts_enum = SP_RTS_ON
+            case ('flow_control')
+                rts_enum = SP_RTS_FLOW_CONTROL
+            case default
+                ok = .false. 
+                rts_enum = SP_RTS_INVALID
+        end select
+    end subroutine get_rts_enum
 
 
 end module serialport_utils
