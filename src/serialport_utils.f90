@@ -25,6 +25,13 @@ module serialport_utils
     public spu_set_config_rts
     public spu_get_config_cts
     public spu_set_config_cts
+    public spu_get_config_dtr
+    public spu_set_config_dtr
+    public spu_get_config_dsr
+    public spu_set_config_dsr
+    public spu_get_config_xon_xoff
+    public spu_set_config_xon_xoff
+    public spu_set_config_flowcontrol
     public spu_get_num_ports 
     public spu_get_port_name 
     public spu_get_port_desc
@@ -45,6 +52,14 @@ module serialport_utils
     public get_rts_enum
     public get_cts_string
     public get_cts_enum
+    public get_dtr_string
+    public get_dtr_enum
+    public get_dsr_string
+    public get_dsr_enum
+    public get_xon_xoff_string
+    public get_xon_xoff_enum
+    public get_flowcontrol_string
+    public get_flowcontrol_enum
 
     interface
 
@@ -247,6 +262,90 @@ module serialport_utils
             integer(c_int), intent(in), value :: cts
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_set_config_cts
+
+
+        !void spu_get_config_dtr(const struct sp_port_config *config, enum sp_dtr *dtr, int *err_flag)
+        subroutine spu_get_config_dtr(config, dtr, err_flag) &
+            bind(c, name="spu_get_config_dtr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: dtr 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_dtr
+
+
+        !void spu_set_config_dtr(struct sp_port_config *config, enum sp_dtr dtr, int *err_flag)
+        subroutine spu_set_config_dtr(config, dtr, err_flag) &
+            bind(c, name="spu_set_config_dtr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: dtr
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_dtr
+
+
+        !void spu_get_config_dsr(const struct sp_port_config *config, enum sp_dsr *dsr, int *err_flag)
+        subroutine spu_get_config_dsr(config, dsr, err_flag) &
+            bind(c, name="spu_get_config_dsr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: dsr 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_dsr
+
+
+        !void spu_set_config_dsr(struct sp_port_config *config, enum sp_dsr dsr, int *err_flag)
+        subroutine spu_set_config_dsr(config, dsr, err_flag) &
+            bind(c, name="spu_set_config_dsr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: dsr
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_dsr
+
+
+        !void spu_get_config_xon_xoff(const struct sp_port_config *config, enum sp_xon_xoff *xon_xoff, int *err_flag)
+        subroutine spu_get_config_xon_xoff(config, xon_xoff, err_flag) &
+            bind(c, name="spu_get_config_xon_xoff")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: xon_xoff 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_get_config_xon_xoff
+
+
+        !void spu_set_config_xon_xoff(struct sp_port_config *config, enum sp_xon_xoff xon_xoff, int *err_flag)
+        subroutine spu_set_config_xon_xoff(config, xon_xoff, err_flag) &
+            bind(c, name="spu_set_config_xon_xoff")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: xon_xoff
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_xon_xoff
+
+
+        !void spu_set_config_flowcontrol(struct sp_port_config *config, enum sp_flowcontrol flowcontrol, int *err_flag);
+        subroutine spu_set_config_flowcontrol(config, flowcontrol, err_flag) &
+            bind(c, name="spu_set_config_flowcontrol")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(in), value :: flowcontrol
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config_flowcontrol
 
 
         !void spu_get_num_ports(int *num_ports, int *err_flag)
@@ -579,6 +678,170 @@ contains
                 cts_enum = SP_CTS_INVALID
         end select
     end subroutine get_cts_enum
+
+
+    function get_dtr_string(dtr_enum) result(dtr_string)
+        implicit none
+        integer(c_int), intent(in)     :: dtr_enum
+        character(len=:), allocatable  :: dtr_string
+        select case (dtr_enum)
+            case (SP_DTR_INVALID)
+                dtr_string = 'invalid'
+            case (SP_DTR_OFF)
+                dtr_string = 'off'
+            case (SP_DTR_ON)
+                dtr_string = 'on'
+            case (SP_DTR_FLOW_CONTROL)
+                dtr_string = 'flow_control'
+            case default
+                dtr_string = 'unknown'
+        end select
+    end function get_dtr_string
+
+
+    subroutine get_dtr_enum(dtr_string, dtr_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: dtr_string
+        integer(c_int), intent(out)    :: dtr_enum
+        logical, optional, intent(out) :: ok 
+        if (present(ok)) ok = .true.
+        select case (trim(dtr_string))
+            case ('invalid')
+                dtr_enum = SP_DTR_INVALID
+            case ('off')
+                dtr_enum = SP_DTR_OFF
+            case ('on')
+                dtr_enum = SP_DTR_ON
+            case ('flow_control')
+                dtr_enum = SP_DTR_FLOW_CONTROL
+            case default
+                if (present(ok)) ok = .false. 
+                dtr_enum = SP_DTR_INVALID
+        end select
+    end subroutine get_dtr_enum
+
+
+    function get_dsr_string(dsr_enum) result(dsr_string)
+        implicit none
+        integer(c_int), intent(in)     :: dsr_enum
+        character(len=:), allocatable  :: dsr_string
+        select case (dsr_enum)
+            case (SP_DSR_INVALID)
+                dsr_string = 'invalid'
+            case (SP_DSR_IGNORE)
+                dsr_string = 'ignore'
+            case (SP_DSR_FLOW_CONTROL)
+                dsr_string = 'flow_control'
+            case default
+                dsr_string = 'unknown'
+        end select
+    end function get_dsr_string
+
+
+    subroutine get_dsr_enum(dsr_string, dsr_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: dsr_string
+        integer(c_int), intent(out)    :: dsr_enum
+        logical, optional, intent(out) :: ok 
+        if (present(ok)) ok = .true.
+        select case (trim(dsr_string))
+            case ('invalid')
+                dsr_enum = SP_DSR_INVALID
+            case ('ignore')
+                dsr_enum = SP_DSR_IGNORE
+            case ('flow_control')
+                dsr_enum = SP_DSR_FLOW_CONTROL
+            case default
+                if (present(ok)) ok = .false. 
+                dsr_enum = SP_DSR_INVALID
+        end select
+    end subroutine get_dsr_enum
+
+
+    function get_xon_xoff_string(xon_xoff_enum) result(xon_xoff_string)
+        implicit none
+        integer(c_int), intent(in)     :: xon_xoff_enum
+        character(len=:), allocatable  :: xon_xoff_string
+        select case (xon_xoff_enum)
+            case (SP_XONXOFF_INVALID)
+                xon_xoff_string = 'invalid'
+            case (SP_XONXOFF_DISABLED)
+                xon_xoff_string = 'disabled'
+            case (SP_XONXOFF_IN)
+                xon_xoff_string = 'in'
+            case (SP_XONXOFF_OUT)
+                xon_xoff_string = 'out'
+            case (SP_XONXOFF_INOUT)
+                xon_xoff_string = 'inout'
+            case default
+                xon_xoff_string = 'unknown'
+        end select
+    end function get_xon_xoff_string
+
+
+    subroutine get_xon_xoff_enum(xon_xoff_string, xon_xoff_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: xon_xoff_string
+        integer(c_int), intent(out)    :: xon_xoff_enum
+        logical, optional, intent(out) :: ok 
+        if (present(ok)) ok = .true.
+        select case (trim(xon_xoff_string))
+            case ('invalid')
+                xon_xoff_enum = SP_XONXOFF_INVALID
+            case ('disabled')
+                xon_xoff_enum = SP_XONXOFF_DISABLED
+            case ('in')
+                xon_xoff_enum = SP_XONXOFF_IN
+            case ('out')
+                xon_xoff_enum = SP_XONXOFF_OUT
+            case ('inout')
+                xon_xoff_enum = SP_XONXOFF_INOUT
+            case default
+                if (present(ok)) ok = .false. 
+                xon_xoff_enum = SP_XONXOFF_INVALID
+        end select
+    end subroutine get_xon_xoff_enum
+
+
+    function get_flowcontrol_string(flowcontrol_enum) result(flowcontrol_string)
+        implicit none
+        integer(c_int), intent(in)     :: flowcontrol_enum
+        character(len=:), allocatable  :: flowcontrol_string
+        select case (flowcontrol_enum)
+            case (SP_FLOWCONTROL_NONE)
+                flowcontrol_string = 'none'
+            case (SP_FLOWCONTROL_XONXOFF)
+                flowcontrol_string = 'xon_xoff'
+            case (SP_FLOWCONTROL_RTSCTS)
+                flowcontrol_string = 'rts_cts'
+            case (SP_FLOWCONTROL_DTRDSR)
+                flowcontrol_string = 'dtr_dsr'
+            case default
+                flowcontrol_string = 'unknown'
+        end select
+    end function get_flowcontrol_string
+
+
+    subroutine get_flowcontrol_enum(flowcontrol_string, flowcontrol_enum, ok)
+        implicit none
+        character(len=*), intent(in)   :: flowcontrol_string
+        integer(c_int), intent(out)    :: flowcontrol_enum
+        logical, optional, intent(out) :: ok 
+        if (present(ok)) ok = .true.
+        select case (trim(flowcontrol_string))
+            case ('none')
+                flowcontrol_enum = SP_FLOWCONTROL_NONE
+            case ('xon_xoff')
+                flowcontrol_enum = SP_FLOWCONTROL_XONXOFF
+            case ('rts_cts')
+                flowcontrol_enum = SP_FLOWCONTROL_RTSCTS
+            case ('dtr_dsr')
+                flowcontrol_enum = SP_FLOWCONTROL_DTRDSR
+            case default
+                if (present(ok)) ok = .false. 
+                flowcontrol_enum = SP_FLOWCONTROL_NONE
+        end select
+    end subroutine get_flowcontrol_enum
 
 
 end module serialport_utils

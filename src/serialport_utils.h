@@ -31,19 +31,36 @@ void spu_close_port(struct sp_port *port, int *err_flag);
 
 void spu_new_config(struct sp_port_config **config, int *err_flag);
 void spu_free_config(struct sp_port_config *config, int *err_flag);
+
 void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag);
 void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag);
 void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag);
+
 void spu_get_config_bits(const struct sp_port_config *config, int *bits, int *err_flag);
 void spu_set_config_bits(struct sp_port_config *config, int bits, int *err_flag);
+
 void spu_get_config_parity(const struct sp_port_config *config, enum sp_parity *parity, int *err_flag);
 void spu_set_config_parity(struct sp_port_config *config, enum sp_parity  parity, int *err_flag);
+
 void spu_get_config_stopbits(const struct sp_port_config *config, int *stopbits, int *err_flag);
 void spu_set_config_stopbits(struct sp_port_config *config, int stopbits, int *err_flag);
+
 void spu_get_config_rts(const struct sp_port_config *config, enum sp_rts *rts, int *err_flag);
 void spu_set_config_rts(struct sp_port_config *config, enum sp_rts rts, int *err_flag);
+
 void spu_get_config_cts(const struct sp_port_config *config, enum sp_cts *cts, int *err_flag);
 void spu_set_config_cts(struct sp_port_config *config, enum sp_cts cts, int *err_flag);
+
+void spu_get_config_dtr(const struct sp_port_config *config, enum sp_dtr *dtr, int *err_flag);
+void spu_set_config_dtr(struct sp_port_config *config, enum sp_dtr dtr, int *err_flag);
+
+void spu_get_config_dsr(const struct sp_port_config *config, enum sp_dsr *dsr, int *err_flag);
+void spu_set_config_dsr(struct sp_port_config *config, enum sp_dsr dsr, int *err_flag);
+
+void spu_get_config_xon_xoff(const struct sp_port_config *config, enum sp_xonxoff *xon_xoff, int *err_flag);
+void spu_set_config_xon_xoff(struct sp_port_config *config, enum sp_xonxoff xon_xoff, int *err_flag);
+
+void spu_set_config_flowcontrol(struct sp_port_config *config, enum sp_flowcontrol flowcontrol, int *err_flag);
 
 void spu_get_num_ports(int *num_ports, int *err_flag);
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);

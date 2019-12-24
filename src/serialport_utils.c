@@ -160,6 +160,63 @@ void spu_set_config_cts(struct sp_port_config *config, enum sp_cts cts, int *err
 }
 
 
+void spu_get_config_dtr(const struct sp_port_config *config, enum sp_dtr *dtr, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_dtr(config, dtr) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_dtr(struct sp_port_config *config, enum sp_dtr dtr, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_dtr(config, dtr) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_get_config_dsr(const struct sp_port_config *config, enum sp_dsr *dsr, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_dsr(config, dsr) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_dsr(struct sp_port_config *config, enum sp_dsr dsr, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_dsr(config, dsr) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_get_config_xon_xoff(const struct sp_port_config *config, enum sp_xonxoff *xon_xoff, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_get_config_xon_xoff(config, xon_xoff) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_xon_xoff(struct sp_port_config *config, enum sp_xonxoff xon_xoff, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config_xon_xoff(config, xon_xoff) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
+void spu_set_config_flowcontrol(struct sp_port_config *config, enum sp_flowcontrol flowcontrol, int *err_flag)
+{
+    *err_flag = SPU_ERR;
+    if (sp_set_config_flowcontrol(config, flowcontrol) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
 void spu_get_num_ports(int *num_ports, int *err_flag) {
     struct sp_port **port_list;
     int i=0;
