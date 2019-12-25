@@ -29,6 +29,17 @@ void spu_msleep(int msecs);
 void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag);
 void spu_close_port(struct sp_port *port, int *err_flag);
 
+void spu_set_baudrate(struct sp_port *port, int baudrate, int *err_flag);
+void spu_set_bits(struct sp_port *port, int bits, int *err_flag);
+void spu_set_parity(struct sp_port *port, enum sp_parity parity, int *err_flag);
+void spu_set_stopbits(struct sp_port *port, int stopbits, int *err_flag);
+void spu_set_rts(struct sp_port *port, enum sp_rts rts, int *err_flag);
+void spu_set_cts(struct sp_port *port, enum sp_cts cts, int *err_flag);
+void spu_set_dtr(struct sp_port *port, enum sp_dtr dtr, int *err_flag);
+void spu_set_dsr(struct sp_port *port, enum sp_dsr dsr, int *err_flag);
+void spu_set_xon_xoff(struct sp_port *port, enum sp_xonxoff xon_xoff, int *err_flag);
+void spu_set_flowcontrol(struct sp_port *port, enum sp_flowcontrol flowcontrol, int *err_flag);
+
 void spu_new_config(struct sp_port_config **config, int *err_flag);
 void spu_free_config(struct sp_port_config *config, int *err_flag);
 
@@ -73,6 +84,7 @@ void spu_get_port_info(struct sp_port *port, struct spu_port_info *info, int *er
 void spu_get_port_by_name(char name[], struct sp_port **port, int *err_flag);
 void spu_get_port_by_number(int number, struct sp_port **port, int *err_flag);
 void spu_free_port(struct sp_port *port);
+
 //void spu_get_port_by_serial(char serial[], struct sp_port **port);
 
 #endif 

@@ -87,6 +87,18 @@ module serialport_utils
         end subroutine spu_close_port
 
 
+        !void spu_set_baudrate(struct sp_port *port, int baudrate, int *err_flag)
+        !void spu_set_bits(struct sp_port *port, int bits, int *err_flag)
+        !void spu_set_parity(struct sp_port *port, enum sp_parity parity, int *err_flag)
+        !void spu_set_stopbits(struct sp_port *port, int stopbits, int *err_flag)
+        !void spu_set_rts(struct sp_port *port, enum sp_rts rts, int *err_flag)
+        !void spu_set_cts(struct sp_port *port, enum sp_cts cts, int *err_flag)
+        !void spu_set_dtr(struct sp_port *port, enum sp_dtr dtr, int *err_flag)
+        !void spu_set_dsr(struct sp_port *port, enum sp_dsr dsr, int *err_flag)
+        !void spu_set_xon_xoff(struct sp_port *port, enum sp_xonxoff xon_xoff, int *err_flag)
+        !void spu_set_flowcontrol(struct sp_port *port, enum sp_flowcontrol flowcontrol, int *err_flag)
+
+
         !void spu_new_config(struct sp_port_config **config, int *err_flag)
         subroutine spu_new_config(config, err_flag) &
             bind(c, name="spu_new_config")
