@@ -12,16 +12,6 @@ program serial_test
     type(serialport_info_t)       :: info
     type(serialport_config_t)     :: config
     logical                       :: ok
-    integer                       :: baudrate
-    integer                       :: bytesize
-    integer                       :: stopbits
-    character(len=:), allocatable :: parity_mode
-    character(len=:), allocatable :: rts
-    character(len=:), allocatable :: cts
-    character(len=:), allocatable :: dtr 
-    character(len=:), allocatable :: dsr 
-    character(len=:), allocatable :: xon_xoff 
-
 
     call port_list%update()
     call port_list%print_concise()
@@ -49,16 +39,21 @@ program serial_test
 
     config = serialport_config_t(baudrate=115200) 
 
-    !config = port%get_config()
-    !print *, 'config ok = ', config%ok() 
-    !print *, ''
-
     call config%print_verbose()
-    print *, ''
     print *, ''
 
     call config%print_concise()
     print *, ''
+
+    call port%set_config(config, ok)
+    print *, 'set_config ok = ', ok
+
+
+    config = port%get_config()
+    print *, 'config ok = ', config%ok() 
+    print *, ''
+
+    call config%print_verbose()
     print *, ''
 
     call port%close_conn(ok)

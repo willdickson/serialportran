@@ -33,6 +33,8 @@ void spu_new_config(struct sp_port_config **config, int *err_flag);
 void spu_free_config(struct sp_port_config *config, int *err_flag);
 
 void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *err_flag);
+void spu_set_config(struct sp_port *port, const struct sp_port_config *config, int *err_flag);
+
 void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag);
 void spu_set_config_baudrate(struct sp_port_config *config, int baudrate, int *err_flag);
 
@@ -63,6 +65,7 @@ void spu_set_config_xon_xoff(struct sp_port_config *config, enum sp_xonxoff xon_
 void spu_set_config_flowcontrol(struct sp_port_config *config, enum sp_flowcontrol flowcontrol, int *err_flag);
 
 void spu_get_num_ports(int *num_ports, int *err_flag);
+
 void spu_get_port_name(int port_num, char port_name[], int max_len, int *err_flag);
 void spu_get_port_desc(int port_num, char port_desc[], int max_len, int *err_flag);
 

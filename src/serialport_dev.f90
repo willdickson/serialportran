@@ -14,6 +14,7 @@ module serialport_dev
     use serialport_utils,  only           : spu_free_port
     use serialport_utils,  only           : spu_get_port_by_name
     use serialport_utils,  only           : spu_get_port_by_number
+    use serialport_utils,  only           : spu_set_config
     use serialport_utils,  only           : get_mode_enum 
 
 
@@ -29,6 +30,7 @@ module serialport_dev
         procedure :: ok         => get_serialport_ok
         procedure :: get_info   => get_serialport_info
         procedure :: get_config => get_serialport_config
+        procedure :: set_config => set_serialport_config
         procedure :: is_open    => get_serialport_is_open
         procedure :: open_conn  => open_serialport   
         procedure :: close_conn => close_serialport 
@@ -170,6 +172,24 @@ contains
         type(serialport_config_t)       :: config
         config = serialport_config_t(this%spu_port_ptr)
     end function get_serialport_config
+
+
+    subroutine set_serialport_config(this, config, ok)
+        implicit none
+        class(serialport_t), intent(in)       :: this
+        type(serialport_config_t), intent(in) :: config
+        logical, optional, intent(out)        :: ok
+        integer(c_int)                        :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. config%ok()) return
+        if (.not. this%ok_flag) return
+
+        call spu_set_config(this%spu_port_ptr, config%spu_config_ptr, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+        end if
+    end subroutine set_serialport_config
 
 
     function get_serialport_is_open(this)  result(val)

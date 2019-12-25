@@ -63,6 +63,14 @@ void spu_get_config(struct sp_port *port, struct sp_port_config *config, int *er
 }
 
 
+void spu_set_config(struct sp_port *port, const struct sp_port_config *config, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_set_config(port,config) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}
+
+
 void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag) {
     *err_flag = SPU_ERR;
     if (sp_get_config_baudrate(config,baudrate) == SP_OK) {

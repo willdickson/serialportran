@@ -13,6 +13,7 @@ module serialport_utils
     public spu_new_config
     public spu_free_config
     public spu_get_config
+    public spu_set_config
     public spu_get_config_baudrate
     public spu_set_config_baudrate
     public spu_get_config_bits
@@ -118,6 +119,18 @@ module serialport_utils
             type(c_ptr), intent(in), value    :: config
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_get_config
+
+
+        !void spu_set_config(struct sp_port *port, const struct sp_port_config *config, int *err_flag)
+        subroutine spu_set_config(port, config, err_flag) &
+            bind(c, name="spu_set_config")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            type(c_ptr), intent(in), value    :: config
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_config
 
 
         !void spu_get_config_baudrate(const struct sp_port_config *config, int *baudrate, int *err_flag)
