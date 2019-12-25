@@ -46,6 +46,17 @@ module serialport_config
     implicit none
     private
 
+    integer, parameter           :: default_baudrate = 9600
+    integer, parameter           :: default_bytesize = 8
+    integer, parameter           :: default_stopbits = 1
+    character(len=20), parameter :: default_parity_mode = 'none'
+    character(len=20), parameter :: default_rts = 'off'
+    character(len=20), parameter :: default_cts = 'ignore'
+    character(len=20), parameter :: default_dtr = 'off'
+    character(len=20), parameter :: default_dsr = 'ignore'
+    character(len=20), parameter :: default_xon_xoff = 'disabled'
+
+
     type, public     :: serialport_config_t
         type(c_ptr)  :: spu_config_ptr = C_NULL_PTR
         logical      :: ok_flag = .false.
@@ -76,8 +87,8 @@ module serialport_config
     end type serialport_config_t
 
     interface serialport_config_t
-        procedure :: new_serialport_config
         procedure :: new_serialport_config_from_ptr
+        procedure :: new_serialport_config_from_vals
     end interface serialport_config_t
 
 contains
@@ -85,14 +96,15 @@ contains
     ! Constructors
     ! -------------------------------------------------------------------------
 
-    function new_serialport_config() result(config)
+    function create_serialport_config() result(config)
         implicit none
         type(serialport_config_t)      :: config
         integer(c_int)                 :: err_flag
         config%ok_flag = .false.
         call spu_new_config(config%spu_config_ptr,err_flag)
         if (err_flag == SPU_OK) config%ok_flag = .true.
-    end function new_serialport_config
+    end function create_serialport_config
+
 
     function new_serialport_config_from_ptr(spu_port_ptr) result(config)
         implicit none
@@ -109,6 +121,90 @@ contains
         call spu_get_config(spu_port_ptr, config%spu_config_ptr, err_flag)
         if (err_flag == SPU_OK) config%ok_flag = .true. 
     end function new_serialport_config_from_ptr
+
+
+    function new_serialport_config_from_vals(baudrate, bytesize, stopbits, parity_mode, &  
+            rts, cts, dtr, dsr, xon_xoff) result(config)
+        implicit none
+        integer, optional, intent(in)            :: baudrate
+        integer, optional, intent(in)            :: bytesize
+        integer, optional, intent(in)            :: stopbits
+        character(len=*), optional, intent(in)   :: parity_mode
+        character(len=*), optional, intent(in)   :: rts
+        character(len=*), optional, intent(in)   :: cts
+        character(len=*), optional, intent(in)   :: dtr
+        character(len=*), optional, intent(in)   :: dsr 
+        character(len=*), optional, intent(in)   :: xon_xoff 
+        type(serialport_config_t)      :: config
+        logical                        :: ok
+
+        config = create_serialport_config()
+
+        if (present(baudrate)) then
+            call config%set_baudrate(baudrate, ok)
+        else 
+            call config%set_baudrate(default_baudrate, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(bytesize)) then
+            call config%set_bytesize(bytesize, ok)
+        else
+            call config%set_bytesize(default_bytesize, ok)
+        endif
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(stopbits)) then
+            call config%set_stopbits(stopbits, ok)
+        else
+            call config%set_stopbits(default_stopbits, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(parity_mode)) then
+            call config%set_parity(parity_mode, ok)
+        else
+            call config%set_parity(default_parity_mode, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(rts)) then
+            call config%set_rts(rts, ok)
+        else
+            call config%set_rts(default_rts, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(cts)) then
+            call config%set_cts(cts, ok)
+        else 
+            call config%set_cts(default_cts, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(dtr)) then 
+            call config%set_dtr(dtr, ok)
+        else
+            call config%set_dtr(default_dtr, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(dsr)) then
+            call config%set_dsr(dsr, ok)
+        else 
+            call config%set_dsr(default_dsr, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+        if (present(xon_xoff)) then
+            call config%set_xon_xoff(xon_xoff, ok)
+        else
+            call config%set_xon_xoff(default_xon_xoff, ok)
+        end if
+        config%ok_flag = config%ok_flag .and. ok
+
+    end function new_serialport_config_from_vals
+    
 
     ! Methods
     ! ------------------------------------------------------------------------
