@@ -10,6 +10,16 @@ module serialport_utils
 
     public spu_open_port
     public spu_close_port
+    public spu_set_baudrate
+    public spu_set_bits
+    public spu_set_parity
+    public spu_set_stopbits
+    public spu_set_rts
+    public spu_set_cts
+    public spu_set_dtr
+    public spu_set_dsr
+    public spu_set_xon_xoff
+    public spu_set_flowcontrol
     public spu_new_config
     public spu_free_config
     public spu_get_config
@@ -86,17 +96,124 @@ module serialport_utils
             integer(c_int), intent(out)       :: err_flag
         end subroutine spu_close_port
 
-
         !void spu_set_baudrate(struct sp_port *port, int baudrate, int *err_flag)
+        subroutine spu_set_baudrate(port, baudrate, err_flag) &
+            bind(c, name="spu_set_baudrate")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: baudrate 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_baudrate
+
+
         !void spu_set_bits(struct sp_port *port, int bits, int *err_flag)
+        subroutine spu_set_bits(port, bits, err_flag) &
+            bind(c, name="spu_set_bits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: bits 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_bits
+
+
         !void spu_set_parity(struct sp_port *port, enum sp_parity parity, int *err_flag)
+        subroutine spu_set_parity(port, parity_mode, err_flag) &
+            bind(c, name="spu_set_parity")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: parity_mode 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_parity
+
+
         !void spu_set_stopbits(struct sp_port *port, int stopbits, int *err_flag)
+        subroutine spu_set_stopbits(port, stopbits, err_flag) &
+            bind(c, name="spu_set_stopbits")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: stopbits 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_stopbits
+
+
         !void spu_set_rts(struct sp_port *port, enum sp_rts rts, int *err_flag)
+        subroutine spu_set_rts(port, rts, err_flag) &
+            bind(c, name="spu_set_rts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: rts 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_rts
+
+
         !void spu_set_cts(struct sp_port *port, enum sp_cts cts, int *err_flag)
+        subroutine spu_set_cts(port, cts, err_flag) &
+            bind(c, name="spu_set_cts")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: cts 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_cts
+
+
         !void spu_set_dtr(struct sp_port *port, enum sp_dtr dtr, int *err_flag)
+        subroutine spu_set_dtr(port, dtr, err_flag) &
+            bind(c, name="spu_set_dtr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: dtr 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_dtr
+
+
         !void spu_set_dsr(struct sp_port *port, enum sp_dsr dsr, int *err_flag)
+        subroutine spu_set_dsr(port, dsr, err_flag) &
+            bind(c, name="spu_set_dsr")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: dsr 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_dsr
+
+
         !void spu_set_xon_xoff(struct sp_port *port, enum sp_xonxoff xon_xoff, int *err_flag)
+        subroutine spu_set_xon_xoff(port, xon_xoff, err_flag) &
+            bind(c, name="spu_set_xon_xoff")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: xon_xoff 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_xon_xoff
+
+
         !void spu_set_flowcontrol(struct sp_port *port, enum sp_flowcontrol flowcontrol, int *err_flag)
+        subroutine spu_set_flowcontrol(port, flowcontrol, err_flag) &
+            bind(c, name="spu_set_flowcontrol")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: flowcontrol 
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_set_flowcontrol
 
 
         !void spu_new_config(struct sp_port_config **config, int *err_flag)

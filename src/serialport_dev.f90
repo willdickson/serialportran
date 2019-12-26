@@ -16,6 +16,16 @@ module serialport_dev
     use serialport_utils,  only           : spu_get_port_by_number
     use serialport_utils,  only           : spu_set_config
     use serialport_utils,  only           : get_mode_enum 
+    use serialport_utils,  only           : spu_set_baudrate
+    use serialport_utils,  only           : spu_set_bits
+    use serialport_utils,  only           : spu_set_parity
+    use serialport_utils,  only           : spu_set_stopbits
+    use serialport_utils,  only           : spu_set_rts
+    use serialport_utils,  only           : spu_set_cts
+    use serialport_utils,  only           : spu_set_dtr
+    use serialport_utils,  only           : spu_set_dsr
+    use serialport_utils,  only           : spu_set_xon_xoff
+    use serialport_utils,  only           : spu_set_flowcontrol
 
 
     implicit none
@@ -27,13 +37,25 @@ module serialport_dev
         logical       :: is_open_flag = .false.
         logical       :: ok_flag      = .false.
     contains
-        procedure :: ok         => get_serialport_ok
-        procedure :: get_info   => get_serialport_info
-        procedure :: get_config => get_serialport_config
-        procedure :: set_config => set_serialport_config
-        procedure :: is_open    => get_serialport_is_open
-        procedure :: open_conn  => open_serialport   
-        procedure :: close_conn => close_serialport 
+        procedure :: ok              => get_serialport_ok
+        procedure :: get_info        => get_serialport_info
+        procedure :: get_config      => get_serialport_config
+        procedure :: set_config      => set_serialport_config
+        procedure :: is_open         => get_serialport_is_open
+        procedure :: open_conn       => open_serialport   
+        procedure :: close_conn      => close_serialport 
+
+        !procedure :: set_baudrate    => set_serialport_baudrate
+        !procedure :: set_bytesize    => set_serialport_bytesize
+        !procedure :: set_parity      => set_serialport_parity
+        !procedure :: set_stopbits    => set_serialport_stopbits
+        !procedure :: set_rts         => set_serialport_rts
+        !procedure :: set_cts         => set_serialport_cts
+        !procedure :: set_dtr         => set_serialport_dtr
+        !procedure :: set_dsr         => set_serialport_dsr
+        !procedure :: set_xon_xoff    => set_serialport_xon_xoff
+        !procedure :: set_flowcontrol => set_serialport_flowcontrol
+
         final     :: del_serialport
     end type serialport_t
 
