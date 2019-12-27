@@ -29,35 +29,47 @@ program serial_test
     info = port%get_info()
     print *, 'info.ok() = ', info%ok()
     print *, ''
+
     call info%print_verbose()
     print *, ''
 
+
     call port%open_conn('rw',ok)
-    print *, 'ok = ', ok
+    print *, 'open_conn ok = ', ok
     print *, 'port%is_open() = ', port%is_open()
     print *, ''
 
-    config = serialport_config_t(baudrate=115200) 
+    call port%set_baudrate(9600,ok)
+    print *, 'set_baudrate ok = ', ok
 
-    call config%print_verbose()
-    print *, ''
-
-    call config%print_concise()
-    print *, ''
-
-    call port%set_config(config, ok)
-    print *, 'set_config ok = ', ok
-
+    call port%set_bytesize(8,ok)
+    print *, 'set_baudrate ok = ', ok
 
     config = port%get_config()
-    print *, 'config ok = ', config%ok() 
+    print *, 'config.ok() = ', ok
     print *, ''
+
+    !config = serialport_config_t(baudrate=115200) 
 
     call config%print_verbose()
     print *, ''
 
+    !call config%print_concise()
+    !print *, ''
+
+    !call port%set_config(config, ok)
+    !print *, 'set_config ok = ', ok
+
+
+    !config = port%get_config()
+    !print *, 'config ok = ', config%ok() 
+    !print *, ''
+
+    !call config%print_verbose()
+    !print *, ''
+
     call port%close_conn(ok)
-    print *, 'ok = ', ok
+    print *, 'close_conn ok = ', ok
 
 contains
 

@@ -39,14 +39,13 @@ module serialport_dev
     contains
         procedure :: ok              => get_serialport_ok
         procedure :: get_info        => get_serialport_info
+        procedure :: open_conn       => open_serialport   
+        procedure :: is_open         => get_serialport_is_open
+        procedure :: close_conn      => close_serialport 
         procedure :: get_config      => get_serialport_config
         procedure :: set_config      => set_serialport_config
-        procedure :: is_open         => get_serialport_is_open
-        procedure :: open_conn       => open_serialport   
-        procedure :: close_conn      => close_serialport 
-
-        !procedure :: set_baudrate    => set_serialport_baudrate
-        !procedure :: set_bytesize    => set_serialport_bytesize
+        procedure :: set_baudrate    => set_serialport_baudrate
+        procedure :: set_bytesize    => set_serialport_bytesize
         !procedure :: set_parity      => set_serialport_parity
         !procedure :: set_stopbits    => set_serialport_stopbits
         !procedure :: set_rts         => set_serialport_rts
@@ -110,6 +109,26 @@ contains
     ! Class Methods
     ! -----------------------------------------------------------------
 
+    function get_serialport_ok(this) result(val)
+        implicit none
+        class(serialport_t), intent(in) :: this
+        logical                         :: val
+        val = this%ok_flag
+    end function get_serialport_ok
+
+
+    function get_serialport_info(this) result(info)
+        implicit none
+        class(serialport_t), intent(in) :: this
+        type(serialport_info_t)         :: info
+        if (this%ok_flag) then 
+            info = serialport_info_t(this%spu_port_ptr)
+        else
+            info = serialport_info_t()
+        end if
+    end function get_serialport_info
+
+
     subroutine open_serialport(this, mode, ok) 
         implicit none
 
@@ -168,26 +187,14 @@ contains
     end subroutine close_serialport
 
     
-    function get_serialport_ok(this) result(val)
+    function get_serialport_is_open(this)  result(val)
         implicit none
         class(serialport_t), intent(in) :: this
         logical                         :: val
-        val = this%ok_flag
-    end function get_serialport_ok
+        val = this%is_open_flag
+    end function get_serialport_is_open
 
-
-    function get_serialport_info(this) result(info)
-        implicit none
-        class(serialport_t), intent(in) :: this
-        type(serialport_info_t)         :: info
-        if (this%ok_flag) then 
-            info = serialport_info_t(this%spu_port_ptr)
-        else
-            info = serialport_info_t()
-        end if
-    end function get_serialport_info
-
-
+    
     function get_serialport_config(this) result(config)
         implicit none
         class(serialport_t), intent(in) :: this
@@ -214,12 +221,42 @@ contains
     end subroutine set_serialport_config
 
 
-    function get_serialport_is_open(this)  result(val)
+    subroutine set_serialport_baudrate(this, baudrate, ok)
         implicit none
-        class(serialport_t), intent(in) :: this
-        logical                         :: val
-        val = this%is_open_flag
-    end function get_serialport_is_open
+        class(serialport_t), intent(in)       :: this
+        integer, intent(in)                   :: baudrate
+        logical, optional, intent(out)        :: ok
+        integer(c_int)                        :: baudrate_tmp
+        integer(c_int)                        :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        baudrate_tmp = int(baudrate, kind(c_int))
+        call spu_set_baudrate(this%spu_port_ptr, baudrate_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+        end if
+    end subroutine set_serialport_baudrate
+
+
+    subroutine set_serialport_bytesize(this, bytesize, ok)
+        implicit none
+        class(serialport_t), intent(in)       :: this
+        integer, intent(in)                   :: bytesize
+        logical, optional, intent(out)        :: ok
+        integer(c_int)                        :: bytesize_tmp
+        integer(c_int)                        :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+        
+        bytesize_tmp = int(bytesize, kind(c_int))
+        call spu_set_bits(this%spu_port_ptr, bytesize_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+        end if
+    end subroutine set_serialport_bytesize
 
 
     subroutine del_serialport(this) 
