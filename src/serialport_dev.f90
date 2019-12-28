@@ -7,26 +7,32 @@ module serialport_dev
     use, intrinsic :: iso_c_binding, only : c_associated
 
     use serialport_types 
-    use serialport_info,   only           : serialport_info_t
-    use serialport_config, only           : serialport_config_t
-    use serialport_utils,  only           : spu_open_port
-    use serialport_utils,  only           : spu_close_port
-    use serialport_utils,  only           : spu_free_port
-    use serialport_utils,  only           : spu_get_port_by_name
-    use serialport_utils,  only           : spu_get_port_by_number
-    use serialport_utils,  only           : spu_set_config
-    use serialport_utils,  only           : get_mode_enum 
-    use serialport_utils,  only           : spu_set_baudrate
-    use serialport_utils,  only           : spu_set_bits
-    use serialport_utils,  only           : spu_set_parity
-    use serialport_utils,  only           : spu_set_stopbits
-    use serialport_utils,  only           : spu_set_rts
-    use serialport_utils,  only           : spu_set_cts
-    use serialport_utils,  only           : spu_set_dtr
-    use serialport_utils,  only           : spu_set_dsr
-    use serialport_utils,  only           : spu_set_xon_xoff
-    use serialport_utils,  only           : spu_set_flowcontrol
-    use serialport_utils,  only           : get_parity_enum
+    use serialport_info,   only : serialport_info_t
+    use serialport_config, only : serialport_config_t
+    use serialport_utils,  only : spu_open_port
+    use serialport_utils,  only : spu_close_port
+    use serialport_utils,  only : spu_free_port
+    use serialport_utils,  only : spu_get_port_by_name
+    use serialport_utils,  only : spu_get_port_by_number
+    use serialport_utils,  only : spu_set_config
+    use serialport_utils,  only : get_mode_enum 
+    use serialport_utils,  only : spu_set_baudrate
+    use serialport_utils,  only : spu_set_bits
+    use serialport_utils,  only : spu_set_parity
+    use serialport_utils,  only : spu_set_stopbits
+    use serialport_utils,  only : spu_set_rts
+    use serialport_utils,  only : spu_set_cts
+    use serialport_utils,  only : spu_set_dtr
+    use serialport_utils,  only : spu_set_dsr
+    use serialport_utils,  only : spu_set_xon_xoff
+    use serialport_utils,  only : spu_set_flowcontrol
+    use serialport_utils,  only : get_parity_enum
+    use serialport_utils,  only : get_rts_enum
+    use serialport_utils,  only : get_cts_enum
+    use serialport_utils,  only : get_dtr_enum
+    use serialport_utils,  only : get_dsr_enum
+    use serialport_utils,  only : get_xon_xoff_enum
+    use serialport_utils,  only : get_flowcontrol_enum
 
 
     implicit none
@@ -48,14 +54,13 @@ module serialport_dev
         procedure :: set_baudrate    => set_serialport_baudrate
         procedure :: set_bytesize    => set_serialport_bytesize
         procedure :: set_parity      => set_serialport_parity
-        !procedure :: set_stopbits    => set_serialport_stopbits
-        !procedure :: set_rts         => set_serialport_rts
-        !procedure :: set_cts         => set_serialport_cts
-        !procedure :: set_dtr         => set_serialport_dtr
-        !procedure :: set_dsr         => set_serialport_dsr
-        !procedure :: set_xon_xoff    => set_serialport_xon_xoff
-        !procedure :: set_flowcontrol => set_serialport_flowcontrol
-
+        procedure :: set_stopbits    => set_serialport_stopbits
+        procedure :: set_rts         => set_serialport_rts
+        procedure :: set_cts         => set_serialport_cts
+        procedure :: set_dtr         => set_serialport_dtr
+        procedure :: set_dsr         => set_serialport_dsr
+        procedure :: set_xon_xoff    => set_serialport_xon_xoff
+        procedure :: set_flowcontrol => set_serialport_flowcontrol
         final     :: del_serialport
     end type serialport_t
 
@@ -224,11 +229,11 @@ contains
 
     subroutine set_serialport_baudrate(this, baudrate, ok)
         implicit none
-        class(serialport_t), intent(in)       :: this
-        integer, intent(in)                   :: baudrate
-        logical, optional, intent(out)        :: ok
-        integer(c_int)                        :: baudrate_tmp
-        integer(c_int)                        :: err_flag
+        class(serialport_t), intent(in)    :: this
+        integer, intent(in)                :: baudrate
+        logical, optional, intent(out)     :: ok
+        integer(c_int)                     :: baudrate_tmp
+        integer(c_int)                     :: err_flag
 
         if (present(ok)) ok = .false.
         if (.not. this%ok_flag) return
@@ -243,11 +248,11 @@ contains
 
     subroutine set_serialport_bytesize(this, bytesize, ok)
         implicit none
-        class(serialport_t), intent(in)       :: this
-        integer, intent(in)                   :: bytesize
-        logical, optional, intent(out)        :: ok
-        integer(c_int)                        :: bytesize_tmp
-        integer(c_int)                        :: err_flag
+        class(serialport_t), intent(in)    :: this
+        integer, intent(in)                :: bytesize
+        logical, optional, intent(out)     :: ok
+        integer(c_int)                     :: bytesize_tmp
+        integer(c_int)                     :: err_flag
 
         if (present(ok)) ok = .false.
         if (.not. this%ok_flag) return
@@ -262,12 +267,12 @@ contains
 
     subroutine set_serialport_parity(this, parity_mode, ok)
         implicit none
-        class(serialport_t), intent(in)       :: this
-        character(len=*), intent(in)          :: parity_mode
-        logical, optional, intent(out)        :: ok
-        integer(c_int)                        :: parity_enum
-        integer(c_int)                        :: err_flag
-        logical                               :: enum_ok
+        class(serialport_t), intent(in)     :: this
+        character(len=*), intent(in)        :: parity_mode
+        logical, optional, intent(out)      :: ok
+        integer(c_int)                      :: parity_enum
+        integer(c_int)                      :: err_flag
+        logical                             :: enum_ok
 
         if (present(ok)) ok = .false.
         if (.not. this%ok_flag) return
@@ -280,6 +285,157 @@ contains
             end if
         end if
     end subroutine set_serialport_parity
+
+
+    subroutine set_serialport_stopbits(this, stopbits, ok)
+        implicit none
+        class(serialport_t), intent(in)     :: this
+        integer, intent(in)                 :: stopbits
+        logical, optional, intent(out)      :: ok
+        integer(c_int)                      :: stopbits_tmp
+        integer(c_int)                      :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        stopbits_tmp = int(stopbits,kind(c_int))
+        call spu_set_stopbits(this%spu_port_ptr, stopbits_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+        end if
+    end subroutine set_serialport_stopbits
+
+
+    subroutine set_serialport_rts(this, rts, ok)
+        implicit none
+        class(serialport_t), intent(in)    :: this
+        character(len=*), intent(in)       :: rts
+        logical, optional, intent(out)     :: ok
+        integer(c_int)                     :: rts_enum
+        integer(c_int)                     :: err_flag
+        logical                            :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_rts_enum(rts, rts_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_rts(this%spu_port_ptr, rts_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_rts
+
+
+    subroutine set_serialport_cts(this, cts, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: cts
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: cts_enum
+        integer(c_int)                    :: err_flag
+        logical                           :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_cts_enum(cts, cts_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_cts(this%spu_port_ptr, cts_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_cts
+
+
+    subroutine set_serialport_dtr(this, dtr, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: dtr
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: dtr_enum
+        integer(c_int)                    :: err_flag
+        logical                           :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_dtr_enum(dtr, dtr_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_dtr(this%spu_port_ptr, dtr_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_dtr
+
+
+    subroutine set_serialport_dsr(this, dsr, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: dsr
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: dsr_enum
+        integer(c_int)                    :: err_flag
+        logical                           :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_dsr_enum(dsr, dsr_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_dsr(this%spu_port_ptr, dsr_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_dsr
+
+
+    subroutine set_serialport_xon_xoff(this, xon_xoff, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: xon_xoff
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: xon_xoff_enum
+        integer(c_int)                    :: err_flag
+        logical                           :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_xon_xoff_enum(xon_xoff, xon_xoff_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_xon_xoff(this%spu_port_ptr, xon_xoff_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_xon_xoff
+
+
+    subroutine set_serialport_flowcontrol(this, flowcontrol, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: flowcontrol
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: flowcontrol_enum
+        integer(c_int)                    :: err_flag
+        logical                           :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_flowcontrol_enum(flowcontrol, flowcontrol_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_flowcontrol(this%spu_port_ptr, flowcontrol_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_flowcontrol
 
 
     subroutine del_serialport(this) 

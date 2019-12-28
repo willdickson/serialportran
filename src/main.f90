@@ -48,6 +48,27 @@ program serial_test
     call port%set_parity('none',ok)
     print *, 'set_parity ok = ', ok
 
+    call port%set_stopbits(1,ok)
+    print *, 'set_stopbits ok = ', ok
+
+    call port%set_rts('on',ok)
+    print *, 'set_rts ok = ', ok
+
+    call port%set_cts('ignore',ok)
+    print *, 'set_cts ok = ', ok
+
+    call port%set_dtr('off',ok)
+    print *, 'set_dtr ok = ', ok
+
+    call port%set_dsr('ignore',ok)
+    print *, 'set_dsr ok = ', ok
+
+    call port%set_xon_xoff('in',ok)
+    print *, 'set_xon_xoff ok = ', ok
+
+    call port%set_flowcontrol('none',ok)
+    print *, 'set_flowcontrol ok = ', ok
+
     config = port%get_config()
     print *, 'config.ok() = ', ok
     print *, ''
