@@ -43,7 +43,10 @@ program serial_test
     print *, 'set_baudrate ok = ', ok
 
     call port%set_bytesize(8,ok)
-    print *, 'set_baudrate ok = ', ok
+    print *, 'set_bytesize ok = ', ok
+
+    call port%set_parity('none',ok)
+    print *, 'set_parity ok = ', ok
 
     config = port%get_config()
     print *, 'config.ok() = ', ok

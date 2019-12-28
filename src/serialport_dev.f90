@@ -26,6 +26,7 @@ module serialport_dev
     use serialport_utils,  only           : spu_set_dsr
     use serialport_utils,  only           : spu_set_xon_xoff
     use serialport_utils,  only           : spu_set_flowcontrol
+    use serialport_utils,  only           : get_parity_enum
 
 
     implicit none
@@ -46,7 +47,7 @@ module serialport_dev
         procedure :: set_config      => set_serialport_config
         procedure :: set_baudrate    => set_serialport_baudrate
         procedure :: set_bytesize    => set_serialport_bytesize
-        !procedure :: set_parity      => set_serialport_parity
+        procedure :: set_parity      => set_serialport_parity
         !procedure :: set_stopbits    => set_serialport_stopbits
         !procedure :: set_rts         => set_serialport_rts
         !procedure :: set_cts         => set_serialport_cts
@@ -257,6 +258,28 @@ contains
             if (present(ok)) ok = .true.
         end if
     end subroutine set_serialport_bytesize
+
+
+    subroutine set_serialport_parity(this, parity_mode, ok)
+        implicit none
+        class(serialport_t), intent(in)       :: this
+        character(len=*), intent(in)          :: parity_mode
+        logical, optional, intent(out)        :: ok
+        integer(c_int)                        :: parity_enum
+        integer(c_int)                        :: err_flag
+        logical                               :: enum_ok
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_parity_enum(parity_mode, parity_enum, enum_ok)
+        if (enum_ok) then
+            call spu_set_parity(this%spu_port_ptr, parity_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine set_serialport_parity
 
 
     subroutine del_serialport(this) 
