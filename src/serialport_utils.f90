@@ -50,6 +50,8 @@ module serialport_utils
     public spu_get_port_by_number
     public spu_get_port_info
     public spu_free_port
+    public spu_input_waiting
+    public spu_output_waiting
     public spu_usleep
     public spu_msleep
     public c_char_vector_to_string
@@ -573,6 +575,42 @@ module serialport_utils
             implicit none
             type(c_ptr), intent(in), value :: port
         end subroutine spu_free_port
+
+        !void spu_blocking_read(struct sp_port *port, void *buf, int *count, int timeout_ms, int *err_flag)
+        subroutine spu_blocking_read(port, buf, num_bytes, timeout_ms, err_flag) & 
+            bind(c, name="spu_get_port_info")
+            import c_int
+            import c_ptr
+            implicit none
+            type(c_ptr), intent(in), value   :: port
+            type(c_ptr), intent(in), value   :: buf
+            integer(c_int), intent(inout)    :: num_bytes
+            integer(c_int), intent(in)       :: timeout_ms
+            integer(c_int), intent(out)      :: err_flag
+        end subroutine spu_blocking_read
+
+        !void spu_input_waiting(struct sp_port *port, int *count, int *err_flag)
+        subroutine spu_input_waiting(port, num_bytes, err_flag) &
+            bind(c, name="spu_input_waiting")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value :: port
+            integer(c_int), intent(out)    :: num_bytes
+            integer(c_int), intent(out)    :: err_flag
+        end subroutine spu_input_waiting
+
+
+        !void spu_output_waiting(struct sp_port *port, int *count, int *err_flag)
+        subroutine spu_output_waiting(port, num_bytes, err_flag) &
+            bind(c, name="spu_output_waiting")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value :: port
+            integer(c_int), intent(out)    :: num_bytes
+            integer(c_int), intent(out)    :: err_flag
+        end subroutine spu_output_waiting
 
 
         !void spu_usleep(int usecs);

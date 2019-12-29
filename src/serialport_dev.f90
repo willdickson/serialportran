@@ -26,6 +26,8 @@ module serialport_dev
     use serialport_utils,  only : spu_set_dsr
     use serialport_utils,  only : spu_set_xon_xoff
     use serialport_utils,  only : spu_set_flowcontrol
+    use serialport_utils,  only : spu_input_waiting
+    use serialport_utils,  only : spu_output_waiting
     use serialport_utils,  only : get_parity_enum
     use serialport_utils,  only : get_rts_enum
     use serialport_utils,  only : get_cts_enum
@@ -61,6 +63,8 @@ module serialport_dev
         procedure :: set_dsr         => set_serialport_dsr
         procedure :: set_xon_xoff    => set_serialport_xon_xoff
         procedure :: set_flowcontrol => set_serialport_flowcontrol
+        procedure :: in_waiting      => get_serialport_in_waiting
+        procedure :: out_waiting     => get_serialport_out_waiting
         final     :: del_serialport
     end type serialport_t
 
@@ -436,6 +440,44 @@ contains
             end if
         end if
     end subroutine set_serialport_flowcontrol
+
+
+    subroutine get_serialport_in_waiting(this, num_bytes, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        integer, intent(out)              :: num_bytes
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: num_bytes_tmp
+        integer(c_int)                    :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_input_waiting(this%spu_port_ptr, num_bytes_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            num_bytes = int(num_bytes_tmp, kind(num_bytes))
+        end if
+    end subroutine get_serialport_in_waiting
+
+
+    subroutine get_serialport_out_waiting(this, num_bytes, ok)
+        implicit none
+        class(serialport_t), intent(in)   :: this
+        integer, intent(out)              :: num_bytes
+        logical, optional, intent(out)    :: ok
+        integer(c_int)                    :: num_bytes_tmp
+        integer(c_int)                    :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_output_waiting(this%spu_port_ptr, num_bytes_tmp, err_flag)
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            num_bytes = int(num_bytes_tmp, kind(num_bytes))
+        end if
+    end subroutine get_serialport_out_waiting
 
 
     subroutine del_serialport(this) 

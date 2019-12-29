@@ -12,6 +12,7 @@ program serial_test
     type(serialport_info_t)       :: info
     type(serialport_config_t)     :: config
     logical                       :: ok
+    integer                       :: num_bytes
 
     call port_list%update()
     call port_list%print_concise()
@@ -91,6 +92,16 @@ program serial_test
 
     !call config%print_verbose()
     !print *, ''
+
+    call port%in_waiting(num_bytes, ok)
+    print *, 'in_waiting ok = ', ok
+    print *, 'num_bytes = ', num_bytes 
+
+    call port%out_waiting(num_bytes, ok)
+    print *, 'out_waiting ok = ', ok
+    print *, 'num_bytes = ', num_bytes 
+
+
 
     call port%close_conn(ok)
     print *, 'close_conn ok = ', ok

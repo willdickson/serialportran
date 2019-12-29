@@ -467,4 +467,41 @@ void spu_free_port(struct sp_port *port) {
 }
 
 
+void spu_blocking_read(struct sp_port *port, void *buf, int *count, int timeout_ms, int *err_flag) {
+    int count_request = *count;
+    int rval = 0;
+    rval = sp_blocking_read(port, buf, count_request, (unsigned int)(timeout_ms));
+    if (rval >=0) {
+        *err_flag = SPU_OK;
+        *count = rval;
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
 
+void spu_input_waiting(struct sp_port *port, int *count, int *err_flag) {
+    int rval = sp_input_waiting(port);
+    if (rval >= 0) {
+        *err_flag = SPU_OK;
+        *count = rval;
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
+
+
+void spu_output_waiting(struct sp_port *port, int *count, int *err_flag) {
+    int rval = sp_output_waiting(port);
+    if (rval >= 0) {
+        *err_flag = SPU_OK;
+        *count = rval;
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
