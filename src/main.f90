@@ -1,5 +1,6 @@
 program serial_test
 
+    use, intrinsic :: iso_c_binding, only : c_char
     use serialport_list,   only : serialport_list_t
     use serialport_info,   only : serialport_info_t
     use serialport_config, only : serialport_config_t
@@ -13,6 +14,9 @@ program serial_test
     type(serialport_config_t)     :: config
     logical                       :: ok
     integer                       :: num_bytes
+    character(len=:), allocatable :: bytes_send
+    character(len=:), allocatable :: bytes_recv
+    character(len=:, kind=c_char), allocatable :: tmp
 
     call port_list%update()
     call port_list%print_concise()
@@ -30,77 +34,52 @@ program serial_test
     info = port%get_info()
     print *, 'info.ok() = ', info%ok()
     print *, ''
-
     call info%print_verbose()
     print *, ''
-
 
     call port%open_conn('rw',ok)
     print *, 'open_conn ok = ', ok
     print *, 'port%is_open() = ', port%is_open()
     print *, ''
 
-    call port%set_baudrate(9600,ok)
-    print *, 'set_baudrate ok = ', ok
+    config = serialport_config_t(baudrate=115200)
 
-    call port%set_bytesize(8,ok)
-    print *, 'set_bytesize ok = ', ok
+    call port%set_config(config, ok)
+    !print *, 'set_config ok = ', ok
 
-    call port%set_parity('none',ok)
-    print *, 'set_parity ok = ', ok
-
-    call port%set_stopbits(1,ok)
-    print *, 'set_stopbits ok = ', ok
-
-    call port%set_rts('on',ok)
-    print *, 'set_rts ok = ', ok
-
-    call port%set_cts('ignore',ok)
-    print *, 'set_cts ok = ', ok
-
-    call port%set_dtr('off',ok)
-    print *, 'set_dtr ok = ', ok
-
-    call port%set_dsr('ignore',ok)
-    print *, 'set_dsr ok = ', ok
-
-    call port%set_xon_xoff('in',ok)
-    print *, 'set_xon_xoff ok = ', ok
-
-    call port%set_flowcontrol('none',ok)
-    print *, 'set_flowcontrol ok = ', ok
 
     config = port%get_config()
     print *, 'config.ok() = ', ok
     print *, ''
 
-    !config = serialport_config_t(baudrate=115200) 
-
     call config%print_verbose()
     print *, ''
 
-    !call config%print_concise()
-    !print *, ''
+    num_bytes = 1
+    allocate(character(1)::bytes_send)
+    bytes_send(1:1) = '2'
+    call port%blocking_write(num_bytes, bytes_send, 10, ok)
+    print *, 'blocking_write ok = ', ok
+    print *, 'num_bytes = ', num_bytes
+    print *, 'bytes_send = ', bytes_send
+    print *, ''
 
-    !call port%set_config(config, ok)
-    !print *, 'set_config ok = ', ok
+    num_bytes = 1
+    allocate(character(num_bytes)::bytes_recv)
+    call port%blocking_read(num_bytes, bytes_recv, 10, ok)
+    print *, 'blocking_read ok = ', ok
+    print *, 'num_bytes = ', num_bytes
+    print *, 'bytes_recv = ', bytes_recv
+    print *, ''
 
 
-    !config = port%get_config()
-    !print *, 'config ok = ', config%ok() 
-    !print *, ''
+    !call port%in_waiting(num_bytes, ok)
+    !print *, 'in_waiting ok = ', ok
+    !print *, 'num_bytes = ', num_bytes 
 
-    !call config%print_verbose()
-    !print *, ''
-
-    call port%in_waiting(num_bytes, ok)
-    print *, 'in_waiting ok = ', ok
-    print *, 'num_bytes = ', num_bytes 
-
-    call port%out_waiting(num_bytes, ok)
-    print *, 'out_waiting ok = ', ok
-    print *, 'num_bytes = ', num_bytes 
-
+    !call port%out_waiting(num_bytes, ok)
+    !print *, 'out_waiting ok = ', ok
+    !print *, 'num_bytes = ', num_bytes 
 
 
     call port%close_conn(ok)

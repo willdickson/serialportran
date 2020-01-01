@@ -2,6 +2,7 @@ module serialport_dev
 
     use, intrinsic :: iso_c_binding, only : c_ptr
     use, intrinsic :: iso_c_binding, only : c_int
+    use, intrinsic :: iso_c_binding, only : c_char
     use, intrinsic :: iso_c_binding, only : C_NULL_PTR 
     use, intrinsic :: iso_c_binding, only : C_NULL_CHAR 
     use, intrinsic :: iso_c_binding, only : c_associated
@@ -26,6 +27,8 @@ module serialport_dev
     use serialport_utils,  only : spu_set_dsr
     use serialport_utils,  only : spu_set_xon_xoff
     use serialport_utils,  only : spu_set_flowcontrol
+    use serialport_utils,  only : spu_blocking_read
+    use serialport_utils,  only : spu_blocking_write
     use serialport_utils,  only : spu_input_waiting
     use serialport_utils,  only : spu_output_waiting
     use serialport_utils,  only : get_parity_enum
@@ -63,6 +66,8 @@ module serialport_dev
         procedure :: set_dsr         => set_serialport_dsr
         procedure :: set_xon_xoff    => set_serialport_xon_xoff
         procedure :: set_flowcontrol => set_serialport_flowcontrol
+        procedure :: blocking_read   => serialport_blocking_read
+        procedure :: blocking_write  => serialport_blocking_write
         procedure :: in_waiting      => get_serialport_in_waiting
         procedure :: out_waiting     => get_serialport_out_waiting
         final     :: del_serialport
@@ -440,6 +445,83 @@ contains
             end if
         end if
     end subroutine set_serialport_flowcontrol
+
+
+    subroutine serialport_blocking_read(this, num_bytes, bytes, timeout_ms,  ok)
+        implicit none
+        class(serialport_t), intent(in)        :: this
+        integer, intent(inout)                 :: num_bytes
+        character(len=num_bytes), intent(out)  :: bytes   ! Change to kind=c_char???
+        integer, intent(in)                    :: timeout_ms 
+        logical, optional, intent(out)         :: ok
+
+        character(kind=c_char)                 :: bytes_tmp(num_bytes)
+        integer                                :: num_bytes_req
+        integer                                :: num_bytes_tru
+        integer(c_int)                         :: num_bytes_tmp
+        integer(c_int)                         :: err_flag
+        integer                                :: i
+
+        num_bytes_req = num_bytes
+        num_bytes_tru = 0
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        num_bytes_tmp = int(num_bytes_req,kind(c_int))
+        call spu_blocking_read(this%spu_port_ptr, bytes_tmp, num_bytes_tmp, timeout_ms, err_flag)  
+
+        print *, 'bytes_tmp = ', bytes_tmp
+
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            num_bytes_tru = int(num_bytes_tmp,kind(num_bytes_tru))
+            do i=1,num_bytes_req
+                if (i <= num_bytes_tru) then
+                    bytes(i:i) = bytes_tmp(i)
+                else
+                    bytes(i:i) = ' '
+                end if
+            end do 
+        end if
+        num_bytes = num_bytes_tru
+    end subroutine serialport_blocking_read
+
+
+    subroutine serialport_blocking_write(this, num_bytes, bytes, timeout_ms, ok)
+        implicit none
+        class(serialport_t), intent(in)        :: this
+        integer, intent(inout)                 :: num_bytes
+        character(len=num_bytes), intent(in)   :: bytes  ! Change to kind = c_char????
+        integer, intent(in)                    :: timeout_ms 
+        logical, optional, intent(out)         :: ok
+
+        character(kind=c_char)                 :: bytes_tmp(num_bytes)
+        integer                                :: num_bytes_req
+        integer                                :: num_bytes_tru
+        integer(c_int)                         :: num_bytes_tmp
+        integer(c_int)                         :: err_flag
+        integer                                :: i
+
+        num_bytes_req = num_bytes
+        num_bytes_tru = 0
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        num_bytes_tmp = int(num_bytes_req, kind(c_int))
+        do i=1,num_bytes
+            bytes_tmp(i) = bytes(i:i)
+        end do
+        print *, 'bytes_tmp = ', bytes_tmp
+        call spu_blocking_write(this%spu_port_ptr, bytes_tmp, num_bytes_tmp, timeout_ms, err_flag)  
+
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            num_bytes_tru = int(num_bytes_tmp,kind(num_bytes_tru))
+        end if
+        num_bytes = num_bytes_tru
+    end subroutine serialport_blocking_write
 
 
     subroutine get_serialport_in_waiting(this, num_bytes, ok)

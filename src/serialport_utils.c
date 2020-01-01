@@ -467,10 +467,27 @@ void spu_free_port(struct sp_port *port) {
 }
 
 
-void spu_blocking_read(struct sp_port *port, void *buf, int *count, int timeout_ms, int *err_flag) {
-    int count_request = *count;
-    int rval = 0;
-    rval = sp_blocking_read(port, buf, count_request, (unsigned int)(timeout_ms));
+void spu_blocking_read(struct sp_port *port, char buf[], int *count, int timeout_ms, int *err_flag) {
+    int count_req = *count;
+    int rval = sp_blocking_read(port, (void *)(buf), count_req, (unsigned int)(timeout_ms));
+    if (rval >=0) {
+        if (rval > 0) {
+            printf("%d\n", (int)(buf[0]));
+        }
+        *err_flag = SPU_OK;
+        *count = rval;
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
+
+
+void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag) {
+    int count_req = *count;
+    printf("%d\n", (int)(buf[0]));
+    int rval = sp_blocking_write(port, (void *)(buf), count_req, (unsigned int)(timeout_ms));
     if (rval >=0) {
         *err_flag = SPU_OK;
         *count = rval;

@@ -87,11 +87,11 @@ void spu_free_port(struct sp_port *port);
 
 // TODO
 // --------------------------------------------------------------------------------------------------------------
-void spu_blocking_read(struct sp_port *port, void *buf, int *count, int timeout_ms, int *err_flag);
+void spu_blocking_read(struct sp_port *port, char buf[], int *count, int timeout_ms, int *err_flag);
 //void spu_blocking_read_next(struct sp_port *port, void *buf, int *count, int timeout_ms,  int *err_flag);
 //void spu_nonblocking_read(struct sp_port *port, void *buf,  int *count, int *err_flag);
 
-//void spu_blocking_write(struct sp_port *port, const void *buf, int *count, int timeout_ms, int *err_flag);
+void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag);
 //void spu_nonblocking_write(struct sp_port *port, const void *buf, int *count, int *err_flag);
 
 void spu_input_waiting(struct sp_port *port, int *count, int *err_flag);
