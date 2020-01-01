@@ -467,15 +467,14 @@ void spu_free_port(struct sp_port *port) {
 }
 
 
-void spu_blocking_read(struct sp_port *port, char buf[], int *count, int timeout_ms, int *err_flag) {
-    int count_req = *count;
+void spu_blocking_read(struct sp_port *port, char buf[], size_t *count, int timeout_ms, int *err_flag) {
+    size_t count_req = *count;
     int rval = sp_blocking_read(port, (void *)(buf), count_req, (unsigned int)(timeout_ms));
     if (rval >=0) {
         if (rval > 0) {
-            printf("%d\n", (int)(buf[0]));
         }
         *err_flag = SPU_OK;
-        *count = rval;
+        *count = (size_t)(rval);
     }
     else {
         *err_flag = SPU_ERR;
@@ -484,13 +483,26 @@ void spu_blocking_read(struct sp_port *port, char buf[], int *count, int timeout
 }
 
 
-void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag) {
-    int count_req = *count;
-    printf("%d\n", (int)(buf[0]));
+void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int *err_flag) {
+    size_t count_req = *count;
+    int rval = sp_nonblocking_read(port, (void *)(buf), count_req);
+    if (rval >=0) {
+        *err_flag = SPU_OK;
+        *count = (size_t)(rval);
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
+
+
+void spu_blocking_write(struct sp_port *port, const char buf[], size_t *count, int timeout_ms, int *err_flag) {
+    size_t count_req = *count;
     int rval = sp_blocking_write(port, (void *)(buf), count_req, (unsigned int)(timeout_ms));
     if (rval >=0) {
         *err_flag = SPU_OK;
-        *count = rval;
+        *count = (size_t)(rval);
     }
     else {
         *err_flag = SPU_ERR;
@@ -498,11 +510,26 @@ void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int 
     }
 }
 
-void spu_input_waiting(struct sp_port *port, int *count, int *err_flag) {
+
+void spu_nonblocking_write(struct sp_port *port, const char buf[], size_t *count, int *err_flag) {
+    size_t count_req = *count;
+    int rval = sp_nonblocking_write(port, (void *)(buf), count_req);
+    if (rval >=0) {
+        *err_flag = SPU_OK;
+        *count = (size_t)(rval);
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
+
+
+void spu_input_waiting(struct sp_port *port, size_t *count, int *err_flag) {
     int rval = sp_input_waiting(port);
     if (rval >= 0) {
         *err_flag = SPU_OK;
-        *count = rval;
+        *count = (size_t)(rval);
     }
     else {
         *err_flag = SPU_ERR;
@@ -511,11 +538,11 @@ void spu_input_waiting(struct sp_port *port, int *count, int *err_flag) {
 }
 
 
-void spu_output_waiting(struct sp_port *port, int *count, int *err_flag) {
+void spu_output_waiting(struct sp_port *port, size_t *count, int *err_flag) {
     int rval = sp_output_waiting(port);
     if (rval >= 0) {
         *err_flag = SPU_OK;
-        *count = rval;
+        *count = (size_t)(rval);
     }
     else {
         *err_flag = SPU_ERR;

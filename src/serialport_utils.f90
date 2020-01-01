@@ -1,8 +1,9 @@
 module serialport_utils
 
-    use, intrinsic :: iso_c_binding, only : c_char
-    use, intrinsic :: iso_c_binding, only : c_int
     use, intrinsic :: iso_c_binding, only : c_ptr
+    use, intrinsic :: iso_c_binding, only : c_int
+    use, intrinsic :: iso_c_binding, only : c_char
+    use, intrinsic :: iso_c_binding, only : c_size_t
     use serialport_types 
 
     implicit none
@@ -51,7 +52,9 @@ module serialport_utils
     public spu_get_port_info
     public spu_free_port
     public spu_blocking_read
+    public spu_nonblocking_read
     public spu_blocking_write
+    public spu_nonblocking_write
     public spu_input_waiting
     public spu_output_waiting
     public spu_usleep
@@ -582,31 +585,63 @@ module serialport_utils
         !void spu_blocking_read(struct sp_port *port, void *buf, int *count, int timeout_ms, int *err_flag)
         subroutine spu_blocking_read(port, buf, num_bytes, timeout_ms, err_flag) & 
             bind(c, name="spu_blocking_read")
+            import c_ptr
             import c_int
             import c_char 
-            import c_ptr
+            import c_size_t
             implicit none
             type(c_ptr), intent(in), value      :: port
             character(kind=c_char), intent(in)  :: buf(*)
-            integer(c_int), intent(inout)       :: num_bytes
+            integer(c_size_t), intent(inout)    :: num_bytes
             integer(c_int), intent(in), value   :: timeout_ms
             integer(c_int), intent(out)         :: err_flag
         end subroutine spu_blocking_read
 
 
-        !void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag)
-        subroutine spu_blocking_write(port, buf, num_bytes, timeout_ms, err_flag) &
-            bind(c, name="spu_blocking_write")
-            import c_int
-            import c_char 
+        !void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int *err_flag)
+        subroutine spu_nonblocking_read(port, buf, num_bytes, err_flag) &
+            bind(c, name="spu_nonblocking_read")
             import c_ptr
+            import c_int
+            import c_char
+            import c_size_t
             implicit none
             type(c_ptr), intent(in), value      :: port
             character(kind=c_char), intent(in)  :: buf(*)
-            integer(c_int), intent(inout)       :: num_bytes
+            integer(c_size_t), intent(inout)    :: num_bytes
+            integer(c_int), intent(out)         :: err_flag
+        end subroutine spu_nonblocking_read
+
+
+        !void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag)
+        subroutine spu_blocking_write(port, buf, num_bytes, timeout_ms, err_flag) &
+            bind(c, name="spu_blocking_write")
+            import c_ptr
+            import c_int
+            import c_char 
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value      :: port
+            character(kind=c_char), intent(in)  :: buf(*)
+            integer(c_size_t), intent(inout)    :: num_bytes
             integer(c_int), intent(in), value   :: timeout_ms
             integer(c_int), intent(out)         :: err_flag
         end subroutine spu_blocking_write
+
+
+        !void spu_nonblocking_write(struct sp_port *port, const char buf[], size_t *count, int *err_flag)
+        subroutine spu_nonblocking_write(port, buf, num_bytes, err_flag) &
+            bind(c, name="spu_nonblocking_write")
+            import c_ptr
+            import c_int
+            import c_char 
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value      :: port
+            character(kind=c_char), intent(in)  :: buf(*)
+            integer(c_size_t), intent(inout)    :: num_bytes
+            integer(c_int), intent(out)         :: err_flag
+        end subroutine spu_nonblocking_write
 
 
         !void spu_input_waiting(struct sp_port *port, int *count, int *err_flag)
@@ -614,9 +649,10 @@ module serialport_utils
             bind(c, name="spu_input_waiting")
             import c_ptr
             import c_int
+            import c_size_t
             implicit none
             type(c_ptr), intent(in), value :: port
-            integer(c_int), intent(out)    :: num_bytes
+            integer(c_size_t), intent(out) :: num_bytes
             integer(c_int), intent(out)    :: err_flag
         end subroutine spu_input_waiting
 
@@ -626,9 +662,10 @@ module serialport_utils
             bind(c, name="spu_output_waiting")
             import c_ptr
             import c_int
+            import c_size_t
             implicit none
             type(c_ptr), intent(in), value :: port
-            integer(c_int), intent(out)    :: num_bytes
+            integer(c_size_t), intent(out) :: num_bytes
             integer(c_int), intent(out)    :: err_flag
         end subroutine spu_output_waiting
 

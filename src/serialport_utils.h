@@ -87,15 +87,15 @@ void spu_free_port(struct sp_port *port);
 
 // TODO
 // --------------------------------------------------------------------------------------------------------------
-void spu_blocking_read(struct sp_port *port, char buf[], int *count, int timeout_ms, int *err_flag);
+void spu_blocking_read(struct sp_port *port, char buf[], size_t *count, int timeout_ms, int *err_flag);
 //void spu_blocking_read_next(struct sp_port *port, void *buf, int *count, int timeout_ms,  int *err_flag);
-//void spu_nonblocking_read(struct sp_port *port, void *buf,  int *count, int *err_flag);
+void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int *err_flag);
 
-void spu_blocking_write(struct sp_port *port, const char buf[], int *count, int timeout_ms, int *err_flag);
-//void spu_nonblocking_write(struct sp_port *port, const void *buf, int *count, int *err_flag);
+void spu_blocking_write(struct sp_port *port, const char buf[], size_t *count, int timeout_ms, int *err_flag);
+void spu_nonblocking_write(struct sp_port *port, const char buf[], size_t *count, int *err_flag);
 
-void spu_input_waiting(struct sp_port *port, int *count, int *err_flag);
-void spu_output_waiting(struct sp_port *port, int *count, int *err_flag);
+void spu_input_waiting(struct sp_port *port, size_t *count, int *err_flag);
+void spu_output_waiting(struct sp_port *port, size_t *count, int *err_flag);
 
 //void spu_flush(struct sp_port *port, enum sp_buffer buffers, int *err_flag);
 //void spu_drain(struct sp_port *port, int *err_flag);
