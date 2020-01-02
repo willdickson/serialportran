@@ -37,6 +37,7 @@ module serialport_dev
     use serialport_utils,  only : spu_nonblocking_write
     use serialport_utils,  only : spu_input_waiting
     use serialport_utils,  only : spu_output_waiting
+    use serialport_utils,  only : spu_flush
     use serialport_utils,  only : spu_get_time_ms
     use serialport_utils,  only : get_parity_enum
     use serialport_utils,  only : get_rts_enum
@@ -45,6 +46,7 @@ module serialport_dev
     use serialport_utils,  only : get_dsr_enum
     use serialport_utils,  only : get_xon_xoff_enum
     use serialport_utils,  only : get_flowcontrol_enum
+    use serialport_utils,  only : get_buffer_enum
     use serialport_utils,  only : get_time_ms
 
 
@@ -84,6 +86,7 @@ module serialport_dev
         procedure :: nonblocking_write  => serialport_nonblocking_write
         procedure :: in_waiting         => get_serialport_in_waiting
         procedure :: out_waiting        => get_serialport_out_waiting
+        procedure :: flush_buffer       => flush_serialport_buffer 
         final     :: del_serialport
     end type serialport_t
 
@@ -758,6 +761,30 @@ contains
             if (present(ok)) ok = .true.
         end if
     end subroutine get_serialport_out_waiting
+
+
+    subroutine flush_serialport_buffer(this, buffer, ok)
+        implicit none
+        ! Arguments
+        class(serialport_t), intent(in)   :: this
+        character(len=*), intent(in)      :: buffer
+        logical, optional, intent(out)    :: ok
+        ! Local variables
+        integer(c_int)                    :: buffer_enum
+        logical                           :: enum_ok
+        integer(c_int)                    :: err_flag
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call get_buffer_enum(buffer, buffer_enum, enum_ok)
+        if (enum_ok) then
+            call spu_flush(this%spu_port_ptr, buffer_enum, err_flag)
+            if (err_flag == SPU_OK) then
+                if (present(ok)) ok = .true.
+            end if
+        end if
+    end subroutine flush_serialport_buffer
 
 
     subroutine del_serialport(this) 

@@ -60,6 +60,7 @@ module serialport_utils
     public spu_nonblocking_write
     public spu_input_waiting
     public spu_output_waiting
+    public spu_flush
     public spu_usleep
     public spu_msleep
     public spu_get_time_ms
@@ -83,6 +84,8 @@ module serialport_utils
     public get_xon_xoff_enum
     public get_flowcontrol_string
     public get_flowcontrol_enum
+    public get_buffer_string
+    public get_buffer_enum
     public get_time_ms
 
     interface
@@ -692,6 +695,18 @@ module serialport_utils
         end subroutine spu_output_waiting
 
 
+        !void spu_flush(struct sp_port *port, enum sp_buffer buffers, int *err_flag)
+        subroutine spu_flush(port, buffers, err_flag) &
+            bind(c, name="spu_flush")
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value    :: port
+            integer(c_int), intent(in), value :: buffers
+            integer(c_int), intent(out)       :: err_flag
+        end subroutine spu_flush
+
+
         !void spu_usleep(int usecs);
         subroutine spu_usleep(usec) &
             bind(c, name="spu_usleep")
@@ -1113,6 +1128,42 @@ contains
                 flowcontrol_enum = SP_FLOWCONTROL_NONE
         end select
     end subroutine get_flowcontrol_enum
+
+    function get_buffer_string(buffer_enum) result(buffer_string)
+        implicit none
+        integer(c_int), intent(in)     :: buffer_enum
+        character(len=:), allocatable  :: buffer_string
+        select case (buffer_enum)
+            case (SP_BUF_INPUT)
+                buffer_string = 'input'
+            case (SP_BUF_OUTPUT)
+                buffer_string = 'output'
+            case (SP_BUF_BOTH)
+                buffer_string = 'both'
+            case default
+                buffer_string = 'unknown'
+        end select
+    end function get_buffer_string
+
+
+    subroutine get_buffer_enum(buffer_string, buffer_enum, ok)
+        implicit none
+        character(len=*), intent(in)     :: buffer_string
+        integer(c_int), intent(out)      :: buffer_enum
+        logical, optional, intent(out)   :: ok
+        if (present(ok)) ok = .true.
+        select case (trim(buffer_string))
+            case ('input') 
+                buffer_enum = SP_BUF_INPUT
+            case ('output')
+                buffer_enum = SP_BUF_OUTPUT
+            case ('both')
+                buffer_enum = SP_BUF_BOTH
+            case default
+                if (present(ok)) ok = .false.
+                buffer_enum = 0
+        end select
+    end subroutine get_buffer_enum
 
 
     function get_time_ms() result(t)

@@ -584,3 +584,11 @@ void spu_output_waiting(struct sp_port *port, size_t *count, int *err_flag) {
         *count = 0;
     }
 }
+
+
+void spu_flush(struct sp_port *port, enum sp_buffer buffers, int *err_flag) {
+    *err_flag = SPU_ERR;
+    if (sp_flush(port, buffers) == SP_OK) {
+        *err_flag = SPU_OK;
+    }
+}

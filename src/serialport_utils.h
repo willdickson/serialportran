@@ -98,7 +98,7 @@ void spu_nonblocking_write(struct sp_port *port, const char buf[], size_t *count
 void spu_input_waiting(struct sp_port *port, size_t *count, int *err_flag);
 void spu_output_waiting(struct sp_port *port, size_t *count, int *err_flag);
 
-//void spu_flush(struct sp_port *port, enum sp_buffer buffers, int *err_flag);
+void spu_flush(struct sp_port *port, enum sp_buffer buffers, int *err_flag);
 //void spu_drain(struct sp_port *port, int *err_flag);
 
 //-----------------------------------------------------------------------------------------------------------------

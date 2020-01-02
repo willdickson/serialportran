@@ -62,7 +62,7 @@ program serial_test
     
     t1 = get_time_ms()
 
-    num_send = 100000
+    num_send = 200
     fail_count = 0
 
     do i=1,num_send
@@ -82,7 +82,7 @@ program serial_test
             cycle
         end if
         n = len(bytes_recv)
-        !print *, bytes_recv(1:n-1)
+        print *, bytes_recv(1:n-1)
 
     end do
 
