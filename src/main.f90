@@ -82,7 +82,7 @@ program serial_test
             cycle
         end if
         n = len(bytes_recv)
-        print *, bytes_recv(1:n-1)
+        !print *, bytes_recv(1:n-1)
 
     end do
 
@@ -90,8 +90,11 @@ program serial_test
     dt = t2 - t1
     freq = num_send/(1.0e-3*dt)
 
-    print *, 'freq = ', freq
+    print *, 'num_send   = ', num_send
+    print *, 'dt         = ', 1.0e-3*dt
+    print *, 'freq       = ', freq
     print *, 'fail_count = ', fail_count
+    print *, ''
 
     call port%close_conn(ok)
     if (.not. ok) then
