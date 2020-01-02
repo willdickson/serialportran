@@ -4,11 +4,13 @@ module serialport_dev
     use, intrinsic :: iso_c_binding, only : c_int
     use, intrinsic :: iso_c_binding, only : c_char
     use, intrinsic :: iso_c_binding, only : c_size_t
-    use, intrinsic :: iso_c_binding, only : C_NULL_PTR 
-    use, intrinsic :: iso_c_binding, only : C_NULL_CHAR 
+    use, intrinsic :: iso_c_binding, only : c_null_ptr 
+    use, intrinsic :: iso_c_binding, only : c_null_char 
+    use, intrinsic :: iso_c_binding, only : c_new_line
     use, intrinsic :: iso_c_binding, only : c_associated
 
     use serialport_types 
+    use serialport_kinds
     use serialport_info,   only : serialport_info_t
     use serialport_config, only : serialport_config_t
     use serialport_utils,  only : spu_open_port
@@ -29,11 +31,13 @@ module serialport_dev
     use serialport_utils,  only : spu_set_xon_xoff
     use serialport_utils,  only : spu_set_flowcontrol
     use serialport_utils,  only : spu_blocking_read
+    use serialport_utils,  only : spu_blocking_read_next
     use serialport_utils,  only : spu_nonblocking_read
     use serialport_utils,  only : spu_blocking_write
     use serialport_utils,  only : spu_nonblocking_write
     use serialport_utils,  only : spu_input_waiting
     use serialport_utils,  only : spu_output_waiting
+    use serialport_utils,  only : spu_get_time_ms
     use serialport_utils,  only : get_parity_enum
     use serialport_utils,  only : get_rts_enum
     use serialport_utils,  only : get_cts_enum
@@ -41,14 +45,17 @@ module serialport_dev
     use serialport_utils,  only : get_dsr_enum
     use serialport_utils,  only : get_xon_xoff_enum
     use serialport_utils,  only : get_flowcontrol_enum
+    use serialport_utils,  only : get_time_ms
 
 
     implicit none
-
     private
 
+    character(c_char), parameter :: default_readline_eol = c_new_line
+
+
     type, public      :: serialport_t
-        type(c_ptr)   :: spu_port_ptr = C_NULL_PTR 
+        type(c_ptr)   :: spu_port_ptr = c_null_ptr 
         logical       :: is_open_flag = .false.
         logical       :: ok_flag      = .false.
     contains
@@ -69,7 +76,9 @@ module serialport_dev
         procedure :: set_dsr            => set_serialport_dsr
         procedure :: set_xon_xoff       => set_serialport_xon_xoff
         procedure :: set_flowcontrol    => set_serialport_flowcontrol
+        procedure :: readline           => serialport_readline
         procedure :: blocking_read      => serialport_blocking_read
+        procedure :: blocking_read_next => serialport_blocking_read_next
         procedure :: nonblocking_read   => serialport_nonblocking_read
         procedure :: blocking_write     => serialport_blocking_write
         procedure :: nonblocking_write  => serialport_nonblocking_write
@@ -98,7 +107,7 @@ contains
         integer(c_int)               :: err_flag
 
         port%ok_flag = .false.
-        call spu_get_port_by_name(port_name//C_NULL_CHAR, port%spu_port_ptr, err_flag)
+        call spu_get_port_by_name(port_name//c_null_char, port%spu_port_ptr, err_flag)
         if (err_flag == SPU_OK) then 
             if (c_associated(port%spu_port_ptr)) then
                 port%ok_flag = .true.
@@ -477,6 +486,67 @@ contains
     end subroutine set_serialport_flowcontrol
 
 
+    subroutine serialport_readline(this, bytes, timeout_ms, ok, eol)
+        implicit none
+        ! Arguments
+        class(serialport_t), intent(in)               :: this
+        character(:,c_char), allocatable, intent(out) :: bytes
+        integer, intent(in)                           :: timeout_ms 
+        logical, optional, intent(out)                :: ok
+        character(c_char), optional, intent(in)       :: eol
+        ! Local variables
+        character(c_char)                             :: eol_char
+        integer                                       :: alloc_stat
+        integer(c_size_t)                             :: read_num
+        character(1,c_char)                           :: read_val
+        logical                                       :: read_ok
+        real(dp)                                      :: t_start
+        real(dp)                                      :: dt
+        integer                                       :: n
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        if (allocated(bytes)) then
+            deallocate(bytes, stat=alloc_stat)
+            if (alloc_stat /= 0) return
+        end if
+
+        if (present(eol)) then
+            eol_char = eol
+        else
+            eol_char = default_readline_eol
+        end if
+
+        allocate(character(0,c_char)::bytes, stat=alloc_stat)
+        if (alloc_stat /= 0) return
+
+        t_start = get_time_ms()
+        do 
+            ! Read new byte value from serial port
+            read_num = 1
+            call this%nonblocking_read(read_num,read_val,read_ok)
+            if (.not. read_ok) return
+            if (read_num == 1) then 
+                bytes = bytes//read_val
+                ! Check for termination criteria
+                n = len(bytes)
+                if (bytes(n:n) == eol_char) then
+                    if (present(ok)) ok = .true.
+                    exit
+                end if
+            end if
+
+            ! Elapsed time for timeout condition and exit if necessary
+            dt = get_time_ms() - t_start
+            if (dt > timeout_ms) then
+                if (present(ok)) ok = .false.
+                exit
+            end if
+        end do
+    end subroutine serialport_readline
+
+
     subroutine serialport_blocking_read(this, num_bytes, bytes, timeout_ms,  ok)
         implicit none
         ! Arguments
@@ -512,6 +582,43 @@ contains
             num_bytes = num_bytes_tru
         end if
     end subroutine serialport_blocking_read
+
+
+    subroutine serialport_blocking_read_next(this, num_bytes, bytes, timeout_ms,  ok)
+        implicit none
+        ! Arguments
+        class(serialport_t), intent(in)           :: this
+        integer(c_size_t), intent(inout)          :: num_bytes
+        character(num_bytes,c_char), intent(out)  :: bytes   
+        integer, intent(in)                       :: timeout_ms 
+        logical, optional, intent(out)            :: ok
+        ! Local variables
+        character(1,c_char)                       :: bytes_tmp(num_bytes)
+        integer(c_size_t)                         :: num_bytes_req
+        integer(c_size_t)                         :: num_bytes_tru
+        integer(c_int)                            :: err_flag
+        integer(c_size_t)                         :: i
+
+        num_bytes_req = num_bytes
+        num_bytes_tru = num_bytes
+        num_bytes = 0
+
+        if (present(ok)) ok = .false.
+        if (.not. this%ok_flag) return
+
+        call spu_blocking_read_next(this%spu_port_ptr, bytes_tmp, num_bytes_tru, timeout_ms, err_flag)  
+        if (err_flag == SPU_OK) then
+            if (present(ok)) ok = .true.
+            do i=1,num_bytes_req
+                if (i <= num_bytes_tru) then
+                    bytes(i:i) = bytes_tmp(i)
+                else
+                    bytes(i:i) = ' '
+                end if
+            end do 
+            num_bytes = num_bytes_tru
+        end if
+    end subroutine serialport_blocking_read_next
 
 
     subroutine serialport_nonblocking_read(this, num_bytes, bytes, ok)

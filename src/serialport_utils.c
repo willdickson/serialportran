@@ -4,6 +4,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef _WIN32
+#error "windows time includes not yet implmented "
+#else
+#define ERR_MSG oh nooo!
+#include <time.h>
+#endif
+
+
 
 void spu_usleep(int usecs) {
     int abs_usecs = abs(usecs);
@@ -15,6 +23,17 @@ void spu_msleep(int msecs) {
     int abs_usecs = 1000*abs(msecs);
     usleep((useconds_t)(abs_usecs));
 }
+
+
+#ifdef _WIN32
+#error "windows verion of get_time_ms not yet implemented "
+#else
+void spu_get_time_ms(double *t) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC,&ts);
+    *t = 1000.0*(double)(ts.tv_sec) + 1.0e-6*(double)(ts.tv_nsec);
+}
+#endif
 
 
 void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag) {
@@ -487,6 +506,22 @@ void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int 
     size_t count_req = *count;
     int rval = sp_nonblocking_read(port, (void *)(buf), count_req);
     if (rval >=0) {
+        *err_flag = SPU_OK;
+        *count = (size_t)(rval);
+    }
+    else {
+        *err_flag = SPU_ERR;
+        *count = 0;
+    }
+}
+
+
+void spu_blocking_read_next(struct sp_port *port, char buf[], size_t *count, int timeout_ms,  int *err_flag) {
+    size_t count_req = *count;
+    int rval = sp_blocking_read_next(port, (void *)(buf), count_req, (unsigned int)(timeout_ms));
+    if (rval >=0) {
+        if (rval > 0) {
+        }
         *err_flag = SPU_OK;
         *count = (size_t)(rval);
     }

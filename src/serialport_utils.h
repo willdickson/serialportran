@@ -25,6 +25,7 @@ struct spu_port_info {
 
 void spu_usleep(int usecs);
 void spu_msleep(int msecs);
+void spu_get_time_ms(double *t);
 
 void spu_open_port(struct sp_port *port, enum sp_mode mode_flag, int *err_flag);
 void spu_close_port(struct sp_port *port, int *err_flag);
@@ -88,7 +89,7 @@ void spu_free_port(struct sp_port *port);
 // TODO
 // --------------------------------------------------------------------------------------------------------------
 void spu_blocking_read(struct sp_port *port, char buf[], size_t *count, int timeout_ms, int *err_flag);
-//void spu_blocking_read_next(struct sp_port *port, void *buf, int *count, int timeout_ms,  int *err_flag);
+void spu_blocking_read_next(struct sp_port *port, char buf[], size_t *count, int timeout_ms, int *err_flag);
 void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int *err_flag);
 
 void spu_blocking_write(struct sp_port *port, const char buf[], size_t *count, int timeout_ms, int *err_flag);

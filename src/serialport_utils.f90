@@ -4,7 +4,9 @@ module serialport_utils
     use, intrinsic :: iso_c_binding, only : c_int
     use, intrinsic :: iso_c_binding, only : c_char
     use, intrinsic :: iso_c_binding, only : c_size_t
+    use, intrinsic :: iso_c_binding, only : c_double
     use serialport_types 
+    use serialport_kinds
 
     implicit none
     private
@@ -52,6 +54,7 @@ module serialport_utils
     public spu_get_port_info
     public spu_free_port
     public spu_blocking_read
+    public spu_blocking_read_next
     public spu_nonblocking_read
     public spu_blocking_write
     public spu_nonblocking_write
@@ -59,6 +62,8 @@ module serialport_utils
     public spu_output_waiting
     public spu_usleep
     public spu_msleep
+    public spu_get_time_ms
+
     public c_char_vector_to_string
     public c_char_string_to_vector
     public print_spu_port_info
@@ -78,6 +83,7 @@ module serialport_utils
     public get_xon_xoff_enum
     public get_flowcontrol_string
     public get_flowcontrol_enum
+    public get_time_ms
 
     interface
 
@@ -598,6 +604,22 @@ module serialport_utils
         end subroutine spu_blocking_read
 
 
+        !void spu_blocking_read_next(struct sp_port *port, char buf[], size_t *count, int timeout_ms, int *err_flag)
+        subroutine spu_blocking_read_next(port, buf, num_bytes, timeout_ms, err_flag) &
+            bind(c, name="spu_blocking_read_next")
+            import c_ptr
+            import c_int
+            import c_char 
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value      :: port
+            character(kind=c_char), intent(in)  :: buf(*)
+            integer(c_size_t), intent(inout)    :: num_bytes
+            integer(c_int), intent(in), value   :: timeout_ms
+            integer(c_int), intent(out)         :: err_flag
+        end subroutine spu_blocking_read_next
+
+
         !void spu_nonblocking_read(struct sp_port *port, char buf[],  size_t *count, int *err_flag)
         subroutine spu_nonblocking_read(port, buf, num_bytes, err_flag) &
             bind(c, name="spu_nonblocking_read")
@@ -687,9 +709,21 @@ module serialport_utils
             integer(c_int), intent(in), value  :: msec
         end subroutine spu_msleep 
 
+
+        !void spu_get_time_ms(double *t)
+        subroutine spu_get_time_ms(t) & 
+            bind(c, name="spu_get_time_ms")
+            import c_double
+            implicit none
+            real(c_double), intent(out) :: t
+        end subroutine spu_get_time_ms
+
+
     end interface
 
+
 contains
+
 
     subroutine c_char_string_to_vector(string, vector)
         implicit none
@@ -1079,6 +1113,17 @@ contains
                 flowcontrol_enum = SP_FLOWCONTROL_NONE
         end select
     end subroutine get_flowcontrol_enum
+
+
+    function get_time_ms() result(t)
+        implicit none
+        ! Result
+        real(dp) :: t
+        ! Local variables
+        real(c_double) :: t_tmp
+        call spu_get_time_ms(t_tmp)
+        t = real(t_tmp, kind(t))
+    end function get_time_ms
 
 
 end module serialport_utils

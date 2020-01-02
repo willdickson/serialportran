@@ -9,7 +9,7 @@ module serialport_kinds
     implicit none
     private
 
-    public rp, ip
+    public rp, ip, dp , sp, i4, i8
 
     integer, parameter :: rp = dp
     integer, parameter :: ip = i8

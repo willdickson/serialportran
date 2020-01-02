@@ -11,6 +11,7 @@ serialport = dependency('libserialport')
 util_lib_sources = ['src/serialport_utils.c']
 util_lib = static_library('serialport_utils', util_lib_sources, dependencies : [serialport])
 
+
 cmain_sources = ['src/main.c']
 cmain_inc_dir = include_directories('src')
 executable('cmain', cmain_sources, include_directories : cmain_inc_dir, link_with: util_lib, dependencies : [serialport])
